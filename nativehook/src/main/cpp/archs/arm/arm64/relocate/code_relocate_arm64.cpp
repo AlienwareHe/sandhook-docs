@@ -55,10 +55,12 @@ void* CodeRelocateA64::Relocate(BaseInst *instruction, void *toPc) throw(ErrorCo
     __ Emit(GetLaterBindLabel(cur_offset));
 
     if (!instruction->PcRelate()) {
+        // 写入原指令
         __ Emit(instruction);
         instruction->Ref();
         return cur_pc;
     }
+    // 指令修复
     switch (instruction->InstCode()) {
         CASE(B_BL)
         CASE(B_COND)

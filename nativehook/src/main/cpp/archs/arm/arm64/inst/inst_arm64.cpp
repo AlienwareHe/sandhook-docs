@@ -288,6 +288,7 @@ void A64_LDR_LIT::Disassemble() {
 }
 
 void A64_LDR_LIT::Assemble() {
+    //Get()->opcode = A64_OPCODE_LDR_LIT;
     SET_OPCODE(LDR_LIT);
     ENCODE_OP;
     ENCODE_RT;

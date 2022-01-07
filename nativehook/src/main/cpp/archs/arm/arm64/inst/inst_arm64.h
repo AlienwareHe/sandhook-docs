@@ -397,6 +397,8 @@ namespace SandHook {
         };
 
 
+//        class A64_LDR_LIT
+//                : public A64_INST_PC_REL<A64_STRUCT_LDR_LIT, static_cast<std::underlying_type<InstCodeA64>::type>(InstCodeA64::LDR_LIT)>
         DEFINE_INST_PCREL(LDR_LIT) {
         public:
 
@@ -559,7 +561,8 @@ namespace SandHook {
             FlagsUpdate flagsUpdate;
         };
 
-
+//        class A64_EXCEPTION_GEN
+//                : public InstructionA64<A64_STRUCT_EXCEPTION_GEN, static_cast<std::underlying_type<InstCodeA64>::type>(InstCodeA64::EXCEPTION_GEN)>
         DEFINE_INST(EXCEPTION_GEN) {
         public:
 
@@ -574,6 +577,25 @@ namespace SandHook {
 
             A64_EXCEPTION_GEN(OP op, ExceptionLevel el, U16 imme);
 
+            //            struct A64_STRUCT_EXCEPTION_GEN : public Base {
+            //                InstA64 ll:2;
+            //                InstA64 opcode2:3;
+            //                InstA64 imm16:16;
+            //                InstA64 op:3;
+            //                InstA64 opcode1:8;
+            //            };
+            // inline static bool Is(InstA64& inst)
+            //            inline static bool Is(InstA64 &inst) {
+            //                union {
+            //                    InstA64 raw;
+            //                    // STRUCT_A64 -> DEFINE_OPCODE_A64 -> A64_STRUCT_EXCEPTION_GEN
+            //                    A64_STRUCT_EXCEPTION_GEN inst;
+            //                } inst_test;
+            //                inst_test.raw = inst;
+            //                // A64_OPCODE_EXCEPTION_GEN_1 -> DEFINE_OPCODE_A64(EXCEPTION_GEN_1, 0b11010100)
+            //                return inst_test.inst.opcode1 == A64_OPCODE_EXCEPTION_GEN_1 &&
+            //                       inst_test.inst.opcode2 == A64_OPCODE_EXCEPTION_GEN_2;
+            //            }
             DEFINE_IS_EXT(EXCEPTION_GEN, TEST_INST_OPCODE(EXCEPTION_GEN, 1) && TEST_INST_OPCODE(EXCEPTION_GEN, 2))
 
             void Disassemble() override;
@@ -594,6 +616,20 @@ namespace SandHook {
 
             A64_SVC(void *inst);
 
+            //            inline static bool Is(InstA64 &inst) {
+            //                // 结构体和联合体(共用体)：https://kangzubin.com/c-struct-union/
+            //                // 结构体和联合体嵌套使用技巧：https://www.eet-china.com/mp/a34530.html
+            //                // raw和inst共同占用一块内存地址，inst和raw指向的都是同一个内存首地址，使用raw来接收一个地址，然后inst来控制这个联合体分配的字节大小
+            //                // inst为一个位域形式的结构体，这样就可以达到直接操控位域中的某些位了
+            //                union {
+            //                    InstA64 raw;
+            //                    A64_STRUCT_EXCEPTION_GEN inst;
+            //                } inst_test;
+            //                inst_test.raw = inst;
+            //                return inst_test.inst.opcode1 == A64_OPCODE_EXCEPTION_GEN_1 &&
+            //                       inst_test.inst.opcode2 == A64_OPCODE_EXCEPTION_GEN_2 && inst_test.inst.op == XXC &&
+            //                       inst_test.inst.ll == EL1;
+            //            }
             DEFINE_IS_EXT(EXCEPTION_GEN,  TEST_INST_OPCODE(EXCEPTION_GEN, 1) && TEST_INST_OPCODE(EXCEPTION_GEN, 2) && TEST_INST_FIELD(op, XXC) && TEST_INST_FIELD(ll, EL1))
 
         };

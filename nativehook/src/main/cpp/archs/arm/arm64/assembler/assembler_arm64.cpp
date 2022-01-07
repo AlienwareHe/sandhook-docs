@@ -166,6 +166,7 @@ void AssemblerA64::Ldr(RegisterA64 &rt, const MemOperand &memOperand) {
 }
 
 void AssemblerA64::Ldr(RegisterA64 &rt, Label* label) {
+    //Emit(reinterpret_cast<BaseUnit *>(new A64_LDR_LIT(rt.isX() ? A64_LDR_LIT::LDR_X : A64_LDR_LIT::LDR_W, rt, label)));
     Emit(reinterpret_cast<BaseUnit *>(new INST_A64(LDR_LIT)(rt.isX() ? INST_A64(LDR_LIT)::LDR_X : INST_A64(LDR_LIT)::LDR_W, rt, label)));
 }
 
@@ -256,6 +257,7 @@ void AssemblerA64::Svc(U16 imm) {
 }
 
 void AssemblerA64::Hvc(U16 imm) {
+    //new A64_EXCEPTION_GEN(A64_EXCEPTION_GEN::XXC, EL2, imm))
     Emit(reinterpret_cast<BaseUnit *>(new INST_A64(EXCEPTION_GEN)(INST_A64(EXCEPTION_GEN)::XXC, EL2, imm)));
 }
 

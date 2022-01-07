@@ -25,6 +25,7 @@ namespace SandHook {
             void *backup;
         };
 
+        // 类型重定义，替代typedef c++11新用法
         using BreakCallback = bool (*)(sigcontext*, void*);
 
         class InlineHook {

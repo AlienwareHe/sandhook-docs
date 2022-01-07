@@ -1,0 +1,70 @@
+{
+  "variant": {
+    "module": {
+      "rootBuildGradleFolder": "/Users/alienhe/code/public/SandHook",
+      "sdkFolder": "/Users/alienhe/Library/Android/sdk",
+      "isNativeCompilerSettingsCacheEnabled": false,
+      "isBuildOnlyTargetAbiEnabled": true,
+      "splitsAbiFilterSet": [],
+      "intermediatesFolder": "/Users/alienhe/code/public/SandHook/hooklib/build/intermediates",
+      "gradleModulePathName": ":hooklib",
+      "moduleRootFolder": "/Users/alienhe/code/public/SandHook/hooklib",
+      "makeFile": "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/CMakeLists.txt",
+      "buildSystem": "CMAKE",
+      "compilerSettingsCacheFolder": "/Users/alienhe/code/public/SandHook/.cxx",
+      "cxxFolder": "/Users/alienhe/code/public/SandHook/hooklib/.cxx",
+      "ndkFolder": "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620",
+      "ndkVersion": "23.1.7779620",
+      "ndkSupportedAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "cmakeToolchainFile": "."
+    },
+    "buildSystemArgumentList": [
+      "-DCMAKE_BUILD_TYPE\u003dRelease"
+    ],
+    "cFlagList": [],
+    "cppFlagsList": [],
+    "variantName": "debug",
+    "soFolder": "/Users/alienhe/code/public/SandHook/hooklib/build/intermediates/cmake/debug/lib",
+    "objFolder": "/Users/alienhe/code/public/SandHook/hooklib/build/intermediates/cmake/debug/obj",
+    "jsonFolder": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug",
+    "gradleBuildOutputFolder": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cxx/debug",
+    "isDebuggableEnabled": true,
+    "validAbiList": [
+      "ARMEABI_V7A",
+      "ARM64_V8A"
+    ],
+    "buildTargetSet": []
+  },
+  "abi": "ARM64_V8A",
+  "abiPlatformVersion": 19,
+  "cxxBuildFolder": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a",
+  "jsonFile": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a/android_gradle_build.json",
+  "gradleBuildOutputFolder": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cxx/debug/arm64-v8a",
+  "objFolder": "/Users/alienhe/code/public/SandHook/hooklib/build/intermediates/cmake/debug/obj/arm64-v8a",
+  "buildCommandFile": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a/build_command.txt",
+  "buildOutputFile": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a/build_output.txt",
+  "modelOutputFile": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a/build_model.json",
+  "cmake": {
+    "cmakeListsWrapperFile": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cxx/debug/arm64-v8a/CMakeLists.txt",
+    "toolchainWrapperFile": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cxx/debug/arm64-v8a/android_gradle_build.toolchain.cmake",
+    "buildGenerationStateFile": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cxx/debug/arm64-v8a/build_generation_state.json",
+    "cacheKeyFile": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cxx/debug/arm64-v8a/compiler_cache_key.json",
+    "compilerCacheUseFile": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cxx/debug/arm64-v8a/compiler_cache_use.json",
+    "compilerCacheWriteFile": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cxx/debug/arm64-v8a/compiler_cache_write.json",
+    "toolchainSettingsFromCacheFile": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cxx/debug/arm64-v8a/compiler_settings_cache.cmake",
+    "cmakeWrappingBaseFolder": "."
+  },
+  "jsonGenerationLoggingRecordFile": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a/json_generation_record.json",
+  "compileCommandsJsonFile": "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a/compile_commands.json"
+}

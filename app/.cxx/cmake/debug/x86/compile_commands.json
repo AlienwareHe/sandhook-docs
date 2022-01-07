@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/Users/alienhe/code/public/SandHook/app/.cxx/cmake/debug/x86",
+  "command": "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=i686-none-linux-android19 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dnativelab_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -fPIC   -o CMakeFiles/nativelab.dir/native-lib.cpp.o -c /Users/alienhe/code/public/SandHook/app/src/main/cpp/native-lib.cpp",
+  "file": "/Users/alienhe/code/public/SandHook/app/src/main/cpp/native-lib.cpp"
+}
+]

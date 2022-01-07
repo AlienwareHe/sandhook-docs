@@ -157,12 +157,18 @@ void *InlineHookArm64Android::SingleInstHook(void *origin, void *replace) {
 
     //build backup method
     CodeRelocateA64 relocate = CodeRelocateA64(assembler_backup);
+    // 向backup中复制原指令 & 指令修复
     backup = relocate.Relocate(origin, code_container_inline->Size(), nullptr);
+    // 向backup中设置跳转回剩余指令的指令
 #define __ assembler_backup.
     Label* origin_addr_label = new Label();
+    // ldr x17, #origin_addr_offset
     __ Ldr(IP1, origin_addr_label);
+    // br x17
     __ Br(IP1);
+    // 更新ldr x17, origin_addr_offset中的origin_addr_offset为当前相对偏移地址
     __ Emit(origin_addr_label);
+    // unitData: origin指令下一条指令地址
     __ Emit((Addr) origin + code_container_inline->Size());
     __ Finish();
 #undef __
@@ -213,20 +219,26 @@ bool InlineHookArm64Android::SingleBreakPoint(void *point, BreakCallback callbac
 
 bool InlineHookArm64Android::ExceptionHandler(int num, sigcontext *context) {
     InstA64 *code = reinterpret_cast<InstA64*>(context->pc);
+    // 判断是否是SandHook的异常指令
     if (!IS_OPCODE_A64(*code, EXCEPTION_GEN))
         return false;
     INST_A64(EXCEPTION_GEN) hvc(code);
     hvc.Disassemble();
     if (hvc.imme >= hook_infos.size())
         return false;
+    // 根据异常指令中的索引获取hook函数或者断点函数
     HookInfo &hook_info = hook_infos[hvc.imme];
     if (!hook_info.is_break_point) {
+        // 更改pc地址为hook函数，从hook函数开始执行
         context->pc = reinterpret_cast<U64>(hook_info.replace);
     } else {
+        // 如果是设置断点，那么调用callback，此时断点的那条指令还未执行
         BreakCallback callback = reinterpret_cast<BreakCallback>(hook_info.replace);
         if (callback(context, hook_info.user_data)) {
+            // 执行原指令
             context->pc = reinterpret_cast<U64>(hook_info.backup);
         } else {
+            // 跳过当前指令执行下一跳指令
             context->pc += 4;
         }
     }

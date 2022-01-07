@@ -192,6 +192,7 @@ DEFINE_STRUCT_A64(SUB_EXT_REG) {
 DEFINE_OPCODE_A64(EXCEPTION_GEN_1, 0b11010100)
 DEFINE_OPCODE_A64(EXCEPTION_GEN_2, 0b000)
 DEFINE_STRUCT_A64(EXCEPTION_GEN) {
+    // :结构体中的冒号表示位域，表示该变量占几个bit空间，位域出现的原因是由于某些信息的存储表示只需要几个bit位就可以表示而不需要一个完整的字节，同时也是为了节省存储空间和方便处理。
     InstA64 ll:2;
     InstA64 opcode2:3;
     InstA64 imm16:16;

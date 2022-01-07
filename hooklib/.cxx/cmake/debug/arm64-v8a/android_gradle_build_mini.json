@@ -1,0 +1,16 @@
+{
+  "buildFiles": [
+    "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "/Users/alienhe/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a --target clean"
+  ],
+  "libraries": {
+    "sandhook-Release-arm64-v8a": {
+      "artifactName": "sandhook",
+      "buildCommand": "/Users/alienhe/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a --target sandhook",
+      "abi": "arm64-v8a",
+      "output": "/Users/alienhe/code/public/SandHook/hooklib/build/intermediates/cmake/debug/obj/arm64-v8a/libsandhook.so"
+    }
+  }
+}

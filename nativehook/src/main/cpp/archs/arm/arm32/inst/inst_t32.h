@@ -289,6 +289,14 @@ namespace SandHook {
 
             T32_HVC(U16 imme);
 
+            //            inline static bool Is(InstT32 &inst) {
+            //                union {
+            //                    InstT32 raw;
+            //                    T32_STRUCT_HVC inst;
+            //                } inst_test;
+            //                inst_test.raw = inst;
+            //                return inst_test.inst.opcode1 == T32_OPCODE_HVC_1 && inst_test.inst.opcode2 == T32_OPCODE_HVC_2;
+            //            }
             DEFINE_IS_EXT(HVC, TEST_INST_OPCODE(HVC, 1) && TEST_INST_OPCODE(HVC, 2))
 
             void Disassemble() override;
