@@ -1,9 +1,9 @@
 {
-  "ndkFolder": "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620",
+  "ndkFolder": "/Users/alienhe/Library/Android/sdk/ndk/21.4.7075529",
   "messages": [
     {
       "level": "INFO",
-      "message": "android.ndkVersion from module build.gradle is not set"
+      "message": "android.ndkVersion from module build.gradle is 21.4.7075529"
     },
     {
       "level": "INFO",
@@ -51,7 +51,7 @@
     },
     {
       "level": "INFO",
-      "message": "No user requested version, choosing /Users/alienhe/Library/Android/sdk/ndk/23.1.7779620 which is version 23.1.7779620"
+      "message": "Found requested NDK version 21.4.7075529 at /Users/alienhe/Library/Android/sdk/ndk/21.4.7075529"
     }
   ]
 }

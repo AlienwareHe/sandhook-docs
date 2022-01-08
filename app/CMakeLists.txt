@@ -4,7 +4,7 @@
 # Sets the minimum version of CMake required to build the native library.
 
 # CMAKE 3.12+ 支持C++ 20 https://cmake.org/cmake/help/v3.12/prop_tgt/CXX_STANDARD.html
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.4.1)
 
 # Declares and names the project.
 
@@ -22,8 +22,22 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        native-lib.cpp
+        src/main/cpp/native-lib.cpp
         )
+
+include_directories(
+        src/main/cpp
+        ../nativehook/src/main/cpp
+)
+
+add_library(sandhook-native
+        SHARED
+        IMPORTED)
+
+set_target_properties(sandhook-native
+        PROPERTIES IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libsandhook-native.so)
+
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -43,8 +57,9 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-        nativelab
+        app
 
+        sandhook-native
         # Links the target library to the log library
         # included in the NDK.
         ${log-lib})

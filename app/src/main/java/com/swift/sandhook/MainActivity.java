@@ -90,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (Throwable e) {
 
         }
+
+        NativeHookTest.hook();
     }
 
     public static Field getField(Class topClass, String fieldName) throws NoSuchFieldException {

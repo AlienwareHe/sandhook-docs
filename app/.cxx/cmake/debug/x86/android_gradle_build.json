@@ -1,44 +1,46 @@
+
 {
-  "stringTable": {
-    "0": "/Users/alienhe/code/public/SandHook/app/.cxx/cmake/debug/x86",
-    "1": "--target=i686-none-linux-android19 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Dnativelab_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fno-limit-debug-info -fPIC"
-  },
-  "buildFiles": [
-    "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/build/cmake/platforms.cmake",
-    "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/build/cmake/compiler_id.cmake",
-    "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/build/cmake/android.toolchain.cmake",
-    "/Users/alienhe/code/public/SandHook/app/src/main/cpp/CMakeLists.txt",
-    "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/build/cmake/android-legacy.toolchain.cmake"
-  ],
-  "cleanCommands": [
-    "/Users/alienhe/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/alienhe/code/public/SandHook/app/.cxx/cmake/debug/x86\" clean"
-  ],
-  "buildTargetsCommand": "/Users/alienhe/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/alienhe/code/public/SandHook/app/.cxx/cmake/debug/x86\" {LIST_OF_TARGETS_TO_BUILD}",
-  "libraries": {
-    "nativelab-Debug-x86": {
-      "buildCommand": "/Users/alienhe/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/alienhe/code/public/SandHook/app/.cxx/cmake/debug/x86\" nativelab",
-      "buildType": "debug",
-      "toolchain": "517749879",
-      "abi": "x86",
-      "artifactName": "nativelab",
-      "files": [
-        {
-          "src": "/Users/alienhe/code/public/SandHook/app/src/main/cpp/native-lib.cpp",
-          "flagsOrdinal": 1,
-          "workingDirectoryOrdinal": 0
-        }
-      ],
-      "headers": [],
-      "output": "/Users/alienhe/code/public/SandHook/app/build/intermediates/cmake/debug/obj/x86/libnativelab.so"
-    }
-  },
-  "toolchains": {
-    "517749879": {
-      "cppCompilerExecutable": "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++"
-    }
-  },
-  "cFileExtensions": [],
-  "cppFileExtensions": [
-    "cpp"
-  ]
+	"buildFiles" : [ "/Users/alienhe/code/public/SandHook/app/CMakeLists.txt" ],
+	"cleanCommands" : 
+	[
+		"/Users/alienhe/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/public/SandHook/app/.cxx/cmake/debug/x86 --target clean"
+	],
+	"cppFileExtensions" : [ "cpp" ],
+	"libraries" : 
+	{
+		"app-Debug-x86" : 
+		{
+			"abi" : "x86",
+			"artifactName" : "app",
+			"buildCommand" : "/Users/alienhe/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/public/SandHook/app/.cxx/cmake/debug/x86 --target app",
+			"buildType" : "debug",
+			"files" : 
+			[
+				
+				{
+					"flags" : "  --target=i686-none-linux-android19 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dapp_EXPORTS -I../../../../src/main/cpp -I../../../../../nativehook/src/main/cpp  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mstackrealign -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/app/src/main/cpp/native-lib.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/app/.cxx/cmake/debug/x86"
+				}
+			],
+			"output" : "/Users/alienhe/code/public/SandHook/app/build/intermediates/cmake/debug/obj/x86/libapp.so",
+			"toolchain" : "2639989064563389475"
+		},
+		"sandhook-native-Debug-x86" : 
+		{
+			"abi" : "x86",
+			"artifactName" : "sandhook-native",
+			"buildType" : "debug",
+			"output" : "/Users/alienhe/code/public/SandHook/app/src/main/jniLibs/x86/libsandhook-native.so",
+			"toolchain" : "2639989064563389475"
+		}
+	},
+	"toolchains" : 
+	{
+		"2639989064563389475" : 
+		{
+			"cCompilerExecutable" : "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang",
+			"cppCompilerExecutable" : "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++"
+		}
+	}
 }

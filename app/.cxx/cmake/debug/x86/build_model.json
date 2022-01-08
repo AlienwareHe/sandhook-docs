@@ -9,7 +9,7 @@
       "intermediatesFolder": "/Users/alienhe/code/public/SandHook/app/build/intermediates",
       "gradleModulePathName": ":app",
       "moduleRootFolder": "/Users/alienhe/code/public/SandHook/app",
-      "makeFile": "/Users/alienhe/code/public/SandHook/app/src/main/cpp/CMakeLists.txt",
+      "makeFile": "/Users/alienhe/code/public/SandHook/app/CMakeLists.txt",
       "buildSystem": "CMAKE",
       "compilerSettingsCacheFolder": "/Users/alienhe/code/public/SandHook/.cxx",
       "cxxFolder": "/Users/alienhe/code/public/SandHook/app/.cxx",

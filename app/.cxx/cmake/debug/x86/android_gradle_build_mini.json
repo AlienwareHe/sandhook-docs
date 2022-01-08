@@ -1,21 +1,21 @@
 {
   "buildFiles": [
-    "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/build/cmake/platforms.cmake",
-    "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/build/cmake/compiler_id.cmake",
-    "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/build/cmake/android.toolchain.cmake",
-    "/Users/alienhe/code/public/SandHook/app/src/main/cpp/CMakeLists.txt",
-    "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/build/cmake/android-legacy.toolchain.cmake"
+    "/Users/alienhe/code/public/SandHook/app/CMakeLists.txt"
   ],
   "cleanCommands": [
-    "/Users/alienhe/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/alienhe/code/public/SandHook/app/.cxx/cmake/debug/x86\" clean"
+    "/Users/alienhe/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/public/SandHook/app/.cxx/cmake/debug/x86 --target clean"
   ],
-  "buildTargetsCommand": "/Users/alienhe/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/alienhe/code/public/SandHook/app/.cxx/cmake/debug/x86\" {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
-    "nativelab-Debug-x86": {
-      "artifactName": "nativelab",
-      "buildCommand": "/Users/alienhe/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/alienhe/code/public/SandHook/app/.cxx/cmake/debug/x86\" nativelab",
+    "sandhook-native-Debug-x86": {
+      "artifactName": "sandhook-native",
       "abi": "x86",
-      "output": "/Users/alienhe/code/public/SandHook/app/build/intermediates/cmake/debug/obj/x86/libnativelab.so"
+      "output": "/Users/alienhe/code/public/SandHook/app/src/main/jniLibs/x86/libsandhook-native.so"
+    },
+    "app-Debug-x86": {
+      "artifactName": "app",
+      "buildCommand": "/Users/alienhe/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/public/SandHook/app/.cxx/cmake/debug/x86 --target app",
+      "abi": "x86",
+      "output": "/Users/alienhe/code/public/SandHook/app/build/intermediates/cmake/debug/obj/x86/libapp.so"
     }
   }
 }

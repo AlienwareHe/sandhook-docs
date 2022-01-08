@@ -13,8 +13,8 @@
       "buildSystem": "CMAKE",
       "compilerSettingsCacheFolder": "/Users/alienhe/code/public/SandHook/.cxx",
       "cxxFolder": "/Users/alienhe/code/public/SandHook/nativehook/.cxx",
-      "ndkFolder": "/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620",
-      "ndkVersion": "23.1.7779620",
+      "ndkFolder": "/Users/alienhe/Library/Android/sdk/ndk/21.4.7075529",
+      "ndkVersion": "21.4.7075529",
       "ndkSupportedAbiList": [
         "ARMEABI_V7A",
         "ARM64_V8A",
