@@ -39,57 +39,57 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
-        methodBeHooked(hashCode(), 1);
-
-
-        toolbar.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                methodBeHooked(hashCode(), 3);
-                Log.w("gy", "dadadad");
-            }
-        }, 3000);
-
-        // Example of a call to a native method
-        TextView tv = (TextView) findViewById(R.id.sample_text);
-
-        final TestClass str = new TestClass(1);
-
-        str.add1();
-        str.add2();
-        str.testNewHookApi(this, 1);
-
-        str.jni_test();
-
-        Log.e("dd", str.a + "");
-
-        inter = new InterImpl();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                inter.dosth();
-                inter = new Inter() {
-                    @Override
-                    public void dosth() {
-                        Log.e("dosth", hashCode() + "");
-                    }
-                };
-                Log.e("testStub", "res = " + testStub(str, 1, "origin b", false, 'x', "origin e"));
-            }
-        }).start();
-
-        inter.dosth();
-
-        testPluginHook(str);
-
-        MyApp.initedTest = true;
-        try {
-            PendingHookTest.test();
-        } catch (Throwable e) {
-
-        }
+//
+//        methodBeHooked(hashCode(), 1);
+//
+//
+//        toolbar.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                methodBeHooked(hashCode(), 3);
+//                Log.w("gy", "dadadad");
+//            }
+//        }, 3000);
+//
+//        // Example of a call to a native method
+//        TextView tv = (TextView) findViewById(R.id.sample_text);
+//
+//        final TestClass str = new TestClass(1);
+//
+//        str.add1();
+//        str.add2();
+//        str.testNewHookApi(this, 1);
+//
+//        str.jni_test();
+//
+//        Log.e("dd", str.a + "");
+//
+//        inter = new InterImpl();
+//
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                inter.dosth();
+//                inter = new Inter() {
+//                    @Override
+//                    public void dosth() {
+//                        Log.e("dosth", hashCode() + "");
+//                    }
+//                };
+//                Log.e("testStub", "res = " + testStub(str, 1, "origin b", false, 'x', "origin e"));
+//            }
+//        }).start();
+//
+//        inter.dosth();
+//
+//        testPluginHook(str);
+//
+//        MyApp.initedTest = true;
+//        try {
+//            PendingHookTest.test();
+//        } catch (Throwable e) {
+//
+//        }
 
         NativeHookTest.hook();
     }

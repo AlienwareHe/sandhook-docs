@@ -23,6 +23,10 @@ import de.robv.android.xposed.XposedHelpers;
 
 public class MyApp extends Application {
 
+    static {
+        System.loadLibrary("app");
+    }
+
     //for test pending hook case
     public volatile static boolean initedTest = false;
 

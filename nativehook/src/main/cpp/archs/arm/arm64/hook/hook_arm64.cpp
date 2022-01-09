@@ -166,7 +166,7 @@ void *InlineHookArm64Android::SingleInstHook(void *origin, void *replace) {
     __ Ldr(IP1, origin_addr_label);
     // br x17
     __ Br(IP1);
-    // 更新ldr x17, origin_addr_offset中的origin_addr_offset为当前相对偏移地址
+    // 更新ldr x17, origin_addr_offset中的origin_addr_offset为当前相对偏移地址，相当于ldr x17,#0x8
     __ Emit(origin_addr_label);
     // unitData: origin指令下一条指令地址
     __ Emit((Addr) origin + code_container_inline->Size());

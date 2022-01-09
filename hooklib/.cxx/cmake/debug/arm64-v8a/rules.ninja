@@ -25,7 +25,7 @@ rule CUSTOM_COMMAND
 rule ASM_COMPILER__sandhook
   depfile = $DEP_FILE
   deps = gcc
-  command = /Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang  -target aarch64-none-linux-android21 -gcc-toolchain /Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/sysroot $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $IN_ABS
+  command = /opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang  -target aarch64-none-linux-android21 -gcc-toolchain /opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $IN_ABS
   description = Building ASM object $out
 
 
@@ -35,7 +35,7 @@ rule ASM_COMPILER__sandhook
 rule CXX_COMPILER__sandhook
   depfile = $DEP_FILE
   deps = gcc
-  command = /Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $IN_ABS
+  command = /opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $IN_ABS
   description = Building CXX object $out
 
 
@@ -43,7 +43,7 @@ rule CXX_COMPILER__sandhook
 # Rule for linking CXX shared library.
 
 rule CXX_SHARED_LIBRARY_LINKER__sandhook
-  command = $PRE_LINK && /Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
+  command = $PRE_LINK && /opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX shared library $TARGET_FILE
   restat = $RESTAT
 
@@ -52,7 +52,7 @@ rule CXX_SHARED_LIBRARY_LINKER__sandhook
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /Users/alienhe/Library/Android/sdk/cmake/3.6.4111459/bin/cmake -H/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp -B/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a
+  command = /opt/android-sdk/cmake/3.6.4111459/bin/cmake -H/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp -B/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a
   description = Re-running CMake...
   generator = 1
 
@@ -61,7 +61,7 @@ rule RERUN_CMAKE
 # Rule for cleaning all built files.
 
 rule CLEAN
-  command = /Users/alienhe/Library/Android/sdk/cmake/3.6.4111459/bin/ninja -t clean
+  command = /opt/android-sdk/cmake/3.6.4111459/bin/ninja -t clean
   description = Cleaning all built files...
 
 
@@ -69,6 +69,6 @@ rule CLEAN
 # Rule for printing all primary targets available.
 
 rule HELP
-  command = /Users/alienhe/Library/Android/sdk/cmake/3.6.4111459/bin/ninja -t targets
+  command = /opt/android-sdk/cmake/3.6.4111459/bin/ninja -t targets
   description = All primary targets available:
 
