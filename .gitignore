@@ -10,3 +10,4 @@
 .externalNativeBuild
 .cxx
 */.cxx
+/app/.cxx/

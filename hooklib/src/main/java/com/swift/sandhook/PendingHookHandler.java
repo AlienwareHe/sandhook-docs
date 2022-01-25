@@ -33,6 +33,7 @@ public class PendingHookHandler {
             pendingHooks.put(hookEntity.target.getDeclaringClass(), entities);
         }
         entities.add(hookEntity);
+        SandHook.addPendingHookNative(hookEntity.target);
     }
 
     public static void onClassInit(long clazz_ptr) {

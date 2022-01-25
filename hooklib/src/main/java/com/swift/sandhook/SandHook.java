@@ -406,6 +406,8 @@ public class SandHook {
 
     public static native void MakeInitializedClassVisibilyInitialized(long self);
 
+    public static native void addPendingHookNative(Member target);
+
     @FunctionalInterface
     public interface HookModeCallBack {
         int hookMode(Member originMethod);

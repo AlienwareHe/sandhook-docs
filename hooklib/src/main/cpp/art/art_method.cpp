@@ -21,7 +21,7 @@ void ArtMethod::tryDisableInline() {
     if (SDK_INT < ANDROID_O)
         return;
     uint32_t accessFlag = getAccessFlags();
-    accessFlag &= ~ 0x08000000;
+    accessFlag &= ~ 0x08000000u;
     setAccessFlags(accessFlag);
 }
 
@@ -43,28 +43,34 @@ void ArtMethod::disableCompilable() {
     if (SDK_INT < ANDROID_N)
         return;
     uint32_t accessFlag = getAccessFlags();
-    if (SDK_INT >= ANDROID_O2) {
-        accessFlag |= 0x02000000;
-        accessFlag |= 0x00800000;
+    if (SDK_INT >= ANDROID_S) {
+        accessFlag |= 0x02000000u;
+        accessFlag &= ~0x00800000u;
+    } else if (SDK_INT >= ANDROID_R) {
+        accessFlag |= 0x02000000u;
+        accessFlag &= ~0x00200000u;
+    } else if (SDK_INT >= ANDROID_O2) {
+        accessFlag |= 0x02000000u;
+        accessFlag |= 0x00800000u;
     } else {
-        accessFlag |= 0x01000000;
+        accessFlag |= 0x01000000u;
     }
     setAccessFlags(accessFlag);
 }
 
 bool ArtMethod::isAbstract() {
     uint32_t accessFlags = getAccessFlags();
-    return ((accessFlags & 0x0400) != 0);
+    return ((accessFlags & 0x0400u) != 0);
 }
 
 bool ArtMethod::isNative() {
     uint32_t accessFlags = getAccessFlags();
-    return ((accessFlags & 0x0100) != 0);
+    return ((accessFlags & 0x0100u) != 0);
 }
 
 bool ArtMethod::isStatic() {
     uint32_t accessFlags = getAccessFlags();
-    return ((accessFlags & 0x0008) != 0);
+    return ((accessFlags & 0x0008u) != 0);
 }
 
 bool ArtMethod::isCompiled() {
