@@ -2,11 +2,11 @@
 {
 	"buildFiles" : 
 	[
-		"/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/CMakeLists.txt"
+		"/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/CMakeLists.txt"
 	],
 	"cleanCommands" : 
 	[
-		"/opt/android-sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a --target clean"
+		"/Users/alienhe/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a --target clean"
 	],
 	"cppFileExtensions" : [ "cpp" ],
 	"libraries" : 
@@ -15,111 +15,111 @@
 		{
 			"abi" : "arm64-v8a",
 			"artifactName" : "sandhook",
-			"buildCommand" : "/opt/android-sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a --target sandhook",
+			"buildCommand" : "/Users/alienhe/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a --target sandhook",
 			"buildType" : "release",
 			"files" : 
 			[
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/sandhook.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/sandhook.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/trampoline/trampoline.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/trampoline/trampoline.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/trampoline/trampoline_manager.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/trampoline/trampoline_manager.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/utils/dlfcn_nougat.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/utils/dlfcn_nougat.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/utils/hide_api.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/utils/hide_api.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/utils/utils.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/utils/utils.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/utils/offset.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/utils/offset.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/utils/elf_util.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/utils/elf_util.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/casts/cast_art_method.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/casts/cast_art_method.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/casts/cast_compiler_options.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/casts/cast_compiler_options.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/art/art_method.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/art/art_method.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/art/art_compiler_options.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/art/art_compiler_options.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/inst/insts_arm32.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/inst/insts_arm32.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/inst/insts_arm64.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/inst/insts_arm64.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				},
 				
 				{
-					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
-					"src" : "/Users/alienhe/code/private/sandhook-docs/hooklib/src/main/cpp/nativehook/native_hook.cpp",
-					"workingDirectory" : "/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a"
+					"flags" : "  --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dsandhook_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -DNDEBUG  -fPIC   -std=c++11  -c ",
+					"src" : "/Users/alienhe/code/public/SandHook/hooklib/src/main/cpp/nativehook/native_hook.cpp",
+					"workingDirectory" : "/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a"
 				}
 			],
-			"output" : "/Users/alienhe/code/private/sandhook-docs/hooklib/build/intermediates/cmake/debug/obj/arm64-v8a/libsandhook.so",
-			"toolchain" : "8501283875841292365"
+			"output" : "/Users/alienhe/code/public/SandHook/hooklib/build/intermediates/cmake/debug/obj/arm64-v8a/libsandhook.so",
+			"toolchain" : "1971334295084358920"
 		}
 	},
 	"toolchains" : 
 	{
-		"8501283875841292365" : 
+		"1971334295084358920" : 
 		{
-			"cCompilerExecutable" : "/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang",
-			"cppCompilerExecutable" : "/opt/android-sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++"
+			"cCompilerExecutable" : "/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang",
+			"cppCompilerExecutable" : "/Users/alienhe/Library/Android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++"
 		}
 	}
 }

@@ -1,4 +1,4 @@
-# Install script for directory: /Users/alienhe/code/private/sandhook-docs/nativehook/src/main/cpp
+# Install script for directory: /Users/alienhe/code/public/SandHook/nativehook/src/main/cpp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/alienhe/code/private/sandhook-docs/nativehook/.cxx/cmake/debug/arm64-v8a/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/alienhe/code/public/SandHook/nativehook/.cxx/cmake/debug/arm64-v8a/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

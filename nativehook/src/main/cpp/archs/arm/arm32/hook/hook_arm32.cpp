@@ -11,6 +11,7 @@
 #include "code_buffer.h"
 #include "lock.h"
 #include "shellcode_arm.h"
+#include "../../../../sandhook_native.h"
 
 using namespace SandHook::Hook;
 using namespace SandHook::Decoder;
@@ -23,6 +24,7 @@ using namespace SandHook::RegistersA32;
 void *InlineHookArm32Android::Hook(void *origin, void *replace) {
     AutoLock lock(hook_lock);
 
+    _make_rwx(origin, _page_size);
     void* origin_code;
     if (IsThumbCode((Addr) origin)) {
         origin_code = GetThumbCodeAddress(origin);
@@ -84,7 +86,7 @@ bool InlineHookArm32Android::BreakPoint(void *origin, void (*callback)(REG *)) {
     if (origin == nullptr || callback == nullptr)
         return false;
     AutoLock lock(hook_lock);
-
+    _make_rwx(origin, _page_size);
     void* origin_code;
     if (IsThumbCode((Addr) origin)) {
         origin_code = GetThumbCodeAddress(origin);
@@ -147,7 +149,7 @@ void *InlineHookArm32Android::SingleInstHook(void *origin, void *replace) {
         return nullptr;
     }
     AutoLock lock(hook_lock);
-
+    _make_rwx(origin, _page_size);
     void* origin_code;
     if (IsThumbCode((Addr) origin)) {
         origin_code = GetThumbCodeAddress(origin);
@@ -211,6 +213,7 @@ bool InlineHookArm32Android::SingleBreakPoint(void *point, BreakCallback callbac
         return false;
     if (!InitForSingleInstHook())
         return false;
+    _make_rwx(point, _page_size);
     AutoLock lock(hook_lock);
 
     bool is_a32 = false;

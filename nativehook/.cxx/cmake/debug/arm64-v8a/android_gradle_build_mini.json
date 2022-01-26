@@ -1,16 +1,16 @@
 {
   "buildFiles": [
-    "/Users/alienhe/code/private/sandhook-docs/nativehook/src/main/cpp/CMakeLists.txt"
+    "/Users/alienhe/code/public/SandHook/nativehook/src/main/cpp/CMakeLists.txt"
   ],
   "cleanCommands": [
-    "/opt/android-sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/private/sandhook-docs/nativehook/.cxx/cmake/debug/arm64-v8a --target clean"
+    "/Users/alienhe/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/public/SandHook/nativehook/.cxx/cmake/debug/arm64-v8a --target clean"
   ],
   "libraries": {
     "sandhook-native-Debug-arm64-v8a": {
       "artifactName": "sandhook-native",
-      "buildCommand": "/opt/android-sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/private/sandhook-docs/nativehook/.cxx/cmake/debug/arm64-v8a --target sandhook-native",
+      "buildCommand": "/Users/alienhe/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/alienhe/code/public/SandHook/nativehook/.cxx/cmake/debug/arm64-v8a --target sandhook-native",
       "abi": "arm64-v8a",
-      "output": "/Users/alienhe/code/private/sandhook-docs/nativehook/build/intermediates/cmake/debug/obj/arm64-v8a/libsandhook-native.so"
+      "output": "/Users/alienhe/code/public/SandHook/nativehook/build/intermediates/cmake/debug/obj/arm64-v8a/libsandhook-native.so"
     }
   }
 }

@@ -1,3 +1,3 @@
-/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a/CMakeFiles/edit_cache.dir
-/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a/CMakeFiles/rebuild_cache.dir
-/Users/alienhe/code/private/sandhook-docs/hooklib/.cxx/cmake/debug/arm64-v8a/CMakeFiles/sandhook.dir
+/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a/CMakeFiles/rebuild_cache.dir
+/Users/alienhe/code/public/SandHook/hooklib/.cxx/cmake/debug/arm64-v8a/CMakeFiles/sandhook.dir

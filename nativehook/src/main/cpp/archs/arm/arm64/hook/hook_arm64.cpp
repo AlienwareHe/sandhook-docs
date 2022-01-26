@@ -16,10 +16,13 @@ using namespace SandHook::Utils;
 
 #include "assembler_arm64.h"
 #include "code_relocate_arm64.h"
+#include "../../../../sandhook_native.h"
+
 using namespace SandHook::RegistersA64;
 void *InlineHookArm64Android::Hook(void *origin, void *replace) {
     AutoLock lock(hook_lock);
 
+    _make_rwx(origin, _page_size);
     void* backup = nullptr;
     AssemblerA64 assembler_backup(backup_buffer);
 
@@ -57,7 +60,7 @@ bool InlineHookArm64Android::BreakPoint(void *point, void (*callback)(REG regs[]
     if (point == nullptr || callback == nullptr)
         return false;
     AutoLock lock(hook_lock);
-
+    _make_rwx(point, _page_size);
     void* backup = nullptr;
     AssemblerA64 assembler_backup(backup_buffer);
     AssemblerA64 assembler_trampoline(backup_buffer);
@@ -142,6 +145,7 @@ void *InlineHookArm64Android::SingleInstHook(void *origin, void *replace) {
         return nullptr;
     if (!InitForSingleInstHook())
         return nullptr;
+    _make_rwx(origin, _page_size);
     AutoLock lock(hook_lock);
     void* backup = nullptr;
     AssemblerA64 assembler_backup(backup_buffer);
@@ -186,6 +190,7 @@ bool InlineHookArm64Android::SingleBreakPoint(void *point, BreakCallback callbac
     if (!InitForSingleInstHook())
         return false;
     AutoLock lock(hook_lock);
+    _make_rwx(point, _page_size);
     void* backup = nullptr;
     AssemblerA64 assembler_backup(backup_buffer);
 
