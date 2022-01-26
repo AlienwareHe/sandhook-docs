@@ -2,6 +2,11 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.7">
+      <module name="sandhook-docs.app" target="1.8" />
+      <module name="sandhook-docs.hookers" target="1.8" />
+      <module name="sandhook-docs.hooklib" target="1.8" />
+      <module name="sandhook-docs.nativehook" target="1.8" />
+      <module name="sandhook-docs.xposedcompat" target="1.8" />
       <module name="SandHook.app" target="11" />
       <module name="SandHook.hookers" target="11" />
       <module name="SandHook.hooklib" target="11" />

@@ -35,7 +35,7 @@ android {
         }
     }
 
-    android.ndkVersion "21.4.7075529"
+    //android.ndkVersion "21.4.7075529"
 
     publishNonDefault  true
 }
