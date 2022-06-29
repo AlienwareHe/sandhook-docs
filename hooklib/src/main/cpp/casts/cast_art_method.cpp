@@ -194,17 +194,21 @@ namespace SandHook {
         art::mirror::ArtMethod *m2 = getArtMethod(env, artMethod2);
 
         size = m2 - m1;
+        LOGD("ArtMethod size: %zu", size);
 
         //init Members
 
         accessFlag = new CastAccessFlag();
         accessFlag->init(env, m1, size);
+        LOGD("accessFlag offset:%zu",accessFlag->getOffset());
 
         entryPointFromInterpreter = new CastEntryPointFormInterpreter();
         entryPointFromInterpreter->init(env, m1, size);
+        LOGD("entryPointFromInterpreter offset:%zu",entryPointFromInterpreter->getOffset());
 
         entryPointQuickCompiled = new CastEntryPointQuickCompiled();
         entryPointQuickCompiled->init(env, m1, size);
+        LOGD("entryPointQuickCompiled offset:%zu",entryPointQuickCompiled->getOffset());
 
         dexMethodIndex = new CastDexMethodIndex();
         dexMethodIndex->init(env, m1, size);

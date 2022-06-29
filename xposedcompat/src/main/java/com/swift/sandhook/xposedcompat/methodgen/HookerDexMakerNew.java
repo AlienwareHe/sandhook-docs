@@ -2,6 +2,7 @@ package com.swift.sandhook.xposedcompat.methodgen;
 
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.dx.Code;
 import com.android.dx.DexMaker;
@@ -203,6 +204,7 @@ public class HookerDexMakerNew implements HookMaker {
         mHookMethod = mHookClass.getMethod(METHOD_NAME_HOOK, mActualParameterTypes);
         mBackupMethod = mHookClass.getMethod(METHOD_NAME_BACKUP);
         setup(mHookClass);
+        Log.i("test","load hooker class:" + loader);
         return new HookWrapper.HookEntity(mMember, mHookMethod, mBackupMethod, false);
     }
 

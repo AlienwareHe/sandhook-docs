@@ -23,6 +23,10 @@ android {
             path file('CMakeLists.txt')
         }
     }
+
+    packagingOptions {
+        pickFirst '**/*.so'
+    }
 }
 
 dependencies {
@@ -33,6 +37,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    // Android Studio Library Module c++ Debug 的坑 https://www.jianshu.com/p/81c1c147cc18
     implementation project(':hooklib')
     debugImplementation project(':nativehook')
     implementation project(':xposedcompat')

@@ -1,6 +1,7 @@
 package com.swift.sandhook;
 
 import android.os.Build;
+import android.util.Log;
 
 import com.swift.sandhook.annotation.HookMode;
 import com.swift.sandhook.blacklist.HookBlackList;
@@ -166,6 +167,7 @@ public class SandHook {
 
     public final static Object callOriginMethod(boolean backupIsStub, Member originMethod, Method backupMethod, Object thiz, Object[] args) throws Throwable {
         //reset declaring class
+        Log.i("test","call origin method:" + originMethod + ",backupmethod:" + backupMethod,new Throwable());
         if (!backupIsStub && SandHookConfig.SDK_INT >= Build.VERSION_CODES.N) {
             //holder in stack to avoid moving gc
             Class originClassHolder = originMethod.getDeclaringClass();
@@ -183,6 +185,7 @@ public class SandHook {
             }
         } else {
             try {
+                // android12 invoke backup method will crash
                 return backupMethod.invoke(thiz, args);
             } catch (InvocationTargetException throwable) {
                 if (throwable.getCause() != null) {

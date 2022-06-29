@@ -99,9 +99,11 @@ bool doHookWithReplacement(JNIEnv* env,
         originMethod->setQuickCodeEntry(hookTrampoline->replacement->getCode());
         void* entryPointFormInterpreter = hookMethod->getInterpreterCodeEntry();
         if (entryPointFormInterpreter != NULL) {
+            LOGD("originMethod->setInterpreterCodeEntry:%p",entryPointFormInterpreter);
             originMethod->setInterpreterCodeEntry(entryPointFormInterpreter);
         }
         if (hookTrampoline->callOrigin != nullptr) {
+            LOGD("backupMethod->setQuickCodeEntry:%p",hookTrampoline->callOrigin->getCode());
             backupMethod->setQuickCodeEntry(hookTrampoline->callOrigin->getCode());
             backupMethod->flushCache();
         }
@@ -165,6 +167,13 @@ Java_com_swift_sandhook_SandHook_initNative(JNIEnv *env, jclass type, jint sdk, 
 
 }
 
+std::string jstring2string(JNIEnv *env, jstring jStr){
+    const char *cstr = env->GetStringUTFChars(jStr, NULL);
+    std::string str = std::string(cstr);
+    env->ReleaseStringUTFChars(jStr, cstr);
+    return str;
+}
+
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_swift_sandhook_SandHook_hookMethod(JNIEnv *env, jclass type, jobject originMethod,
@@ -174,6 +183,11 @@ Java_com_swift_sandhook_SandHook_hookMethod(JNIEnv *env, jclass type, jobject or
     art::mirror::ArtMethod* hook = getArtMethod(env, hookMethod);
     art::mirror::ArtMethod* backup = backupMethod == NULL ? nullptr : getArtMethod(env,
                                                                                    backupMethod);
+
+
+    jclass objectClass = env->FindClass("java/lang/Object");
+    jmethodID toStringMethodId = env->GetMethodID(objectClass,"toString", "()Ljava/lang/String;");
+    std::string originMethodSig = jstring2string(env,static_cast<jstring>(env->CallObjectMethod(originMethod,toStringMethodId)));
 
     bool isInlineHook = false;
 
@@ -218,8 +232,10 @@ label_hook:
     //suspend other threads
     SandHook::StopTheWorld stopTheWorld;
     if (isInlineHook && trampolineManager.canSafeInline(origin)) {
+        LOGD("doHookWithInline:%s",originMethodSig.c_str());
         return doHookWithInline(env, origin, hook, backup) ? INLINE : -1;
     } else {
+        LOGD("doHookWithReplacement:%s",originMethodSig.c_str());
         return doHookWithReplacement(env, origin, hook, backup) ? REPLACE : -1;
     }
 

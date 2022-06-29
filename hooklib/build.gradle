@@ -6,12 +6,11 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
 
         externalNativeBuild {
             cmake {
-                arguments "-DCMAKE_BUILD_TYPE=Release"
+                arguments "-DCMAKE_BUILD_TYPE=Debug"
+                //arguments "-DCMAKE_BUILD_TYPE=Release"
             }
         }
         ndk {
@@ -26,12 +25,22 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
+            debuggable true
+            jniDebuggable true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        release{
+            debuggable true
+            jniDebuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
+    defaultPublishConfig "debug"
 }
 
 dependencies {
@@ -39,14 +48,14 @@ dependencies {
     api project(':annotation')
 }
 
-apply plugin: 'com.novoda.bintray-release'
-
-publish {
-    userOrg = rootProject.userOrg
-    groupId = rootProject.groupId
-    artifactId = 'hooklib'
-    publishVersion = rootProject.publishVersion
-    desc = rootProject.desc
-    website = rootProject.website
-    licences = rootProject.licences
-}
+//apply plugin: 'com.novoda.bintray-release'
+//
+//publish {
+//    userOrg = rootProject.userOrg
+//    groupId = rootProject.groupId
+//    artifactId = 'hooklib'
+//    publishVersion = rootProject.publishVersion
+//    desc = rootProject.desc
+//    website = rootProject.website
+//    licences = rootProject.licences
+//}

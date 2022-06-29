@@ -115,6 +115,7 @@ public class HookStubManager {
                 originMethods[id] = origin;
                 hookMethodEntities[id] = entity;
                 additionalHookInfos[id] = additionalHookInfo;
+                DexLog.w("internal stub <" + entity.hook.getName() + "> use stub:" + entity.hook);
                 return entity;
             }
         }
@@ -232,7 +233,7 @@ public class HookStubManager {
     }
 
     public static long hookBridge(int id, CallOriginCallBack callOrigin, long... stubArgs) throws Throwable {
-
+        DexLog.w("hook stub bridge come:" + id);
         Member originMethod = originMethods[id];
         HookMethodEntity entity = hookMethodEntities[id];
 

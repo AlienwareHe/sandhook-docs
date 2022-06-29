@@ -1,6 +1,7 @@
 package com.swift.sandhook.xposedcompat.methodgen;
 
 import android.os.Trace;
+import android.util.Log;
 
 import com.swift.sandhook.SandHook;
 import com.swift.sandhook.blacklist.HookBlackList;
@@ -59,6 +60,7 @@ public final class DynamicBridge {
             Trace.beginSection("SandHook-Xposed");
             long timeStart = System.currentTimeMillis();
             HookMethodEntity stub = null;
+            HookMaker hookMaker = null;
             if (XposedCompat.useInternalStub && !HookBlackList.canNotHookByStub(hookMethod) && !HookBlackList.canNotHookByBridge(hookMethod)) {
                 stub = HookStubManager.getHookMethodEntity(hookMethod, additionalHookInfo);
             }
@@ -66,7 +68,6 @@ public final class DynamicBridge {
                 SandHook.hook(new HookWrapper.HookEntity(hookMethod, stub.hook, stub.backup, false));
                 entityMap.put(hookMethod, stub);
             } else {
-                HookMaker hookMaker;
                 if (HookBlackList.canNotHookByBridge(hookMethod)) {
                     hookMaker = new HookerDexMaker();
                 } else {
@@ -76,7 +77,7 @@ public final class DynamicBridge {
                         new ProxyClassLoader(DynamicBridge.class.getClassLoader(), hookMethod.getDeclaringClass().getClassLoader()), dexDir == null ? null : dexDir.getAbsolutePath());
                 hookedInfo.put(hookMethod, hookMaker.getCallBackupMethod());
             }
-            DexLog.d("hook method <" + hookMethod.toString() + "> cost " + (System.currentTimeMillis() - timeStart) + " ms, by " + (stub != null ? "internal stub" : "dex maker"));
+            DexLog.d("hook method <" + hookMethod.toString() + "> cost " + (System.currentTimeMillis() - timeStart) + " ms, by " + (stub != null ? "internal stub" : hookMaker.getClass().getSimpleName()));
             Trace.endSection();
         } catch (Throwable e) {
             DexLog.e("error occur when hook method <" + hookMethod.toString() + ">", e);
