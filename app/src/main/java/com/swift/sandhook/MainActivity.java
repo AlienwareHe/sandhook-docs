@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         final TestClass str = new TestClass(1);
 
-        str.add1();
+//        str.add1();
         str.add2();
         str.testNewHookApi(this, 1);
 

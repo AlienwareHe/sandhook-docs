@@ -8,6 +8,7 @@
 #include "../includes/utils.h"
 #include "../includes/trampoline_manager.h"
 #include "../includes/art_runtime.h"
+#include "../includes/sandhook.h"
 #include <unordered_set>
 #include <mutex>
 
@@ -399,12 +400,12 @@ extern "C" {
         if(make_initialized_classes_visibly_initialized_) {
 #ifdef __LP64__
             size_t OFFSET_classlinker = 472;
-            if(SDK_INT > ANDROID_S){
+            if(SDK_INT >= ANDROID_S){
                 OFFSET_classlinker = 496;
             }
 #else
             constexpr size_t OFFSET_classlinker = 276;
-            if(SDK_INT > ANDROID_S){
+            if(SDK_INT >= ANDROID_S){
                 OFFSET_classlinker = 288;
             }
 #endif
@@ -507,5 +508,20 @@ extern "C" {
         }
     }
 
+
+    bool newSupportNterp() {
+        LOGD("forbid to use nterp");
+        return false;
+    }
+
+    bool forbidUseNterp() {
+        // bool art::interpreter::CanRuntimeUseNterp(art::interpreter *this)
+        void * symbol = getSymCompat(art_lib_path,"_ZN3art11interpreter18CanRuntimeUseNterpEv");
+        if(hook_native(symbol,reinterpret_cast<void *>(newSupportNterp))){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
 

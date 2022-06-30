@@ -92,5 +92,5 @@ namespace SandHook {
         return nativeHookNoBackup(reinterpret_cast<void *>(execve),
                            reinterpret_cast<void *>(disableDex2oat ? fake_execve_disable_oat : fake_execve_disable_inline));
     }
-    
+
 }

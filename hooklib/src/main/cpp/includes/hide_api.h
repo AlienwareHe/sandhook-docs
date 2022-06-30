@@ -58,6 +58,9 @@ extern "C" {
     void MakeInitializedClassVisibilyInitialized(void* self);
 
     void addPendingHookNative(ArtMethod *method);
+
+    bool forbidUseNterp();
+
 }
 
 #endif //SANDHOOK_HIDE_API_H

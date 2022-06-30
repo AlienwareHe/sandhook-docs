@@ -411,6 +411,8 @@ public class SandHook {
 
     public static native void addPendingHookNative(Member target);
 
+    public static native void forbidUseNterp();
+
     @FunctionalInterface
     public interface HookModeCallBack {
         int hookMode(Member originMethod);

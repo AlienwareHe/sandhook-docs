@@ -36,6 +36,7 @@ public class MyApp extends Application {
 
         SandHookConfig.DEBUG = true;
 
+        Log.i("SandHook", "current sdk int:" + Build.VERSION.SDK_INT + ",preview sdk int:" + getPreviewSDKInt());
         if (Build.VERSION.SDK_INT == 29 && getPreviewSDKInt() > 0) {
             // Android R preview
             SandHookConfig.SDK_INT = 30;
@@ -44,6 +45,7 @@ public class MyApp extends Application {
         SandHook.disableVMInline();
         SandHook.tryDisableProfile(getPackageName());
         SandHook.disableDex2oatInline(false);
+        SandHook.forbidUseNterp();
 
         if (SandHookConfig.SDK_INT >= Build.VERSION_CODES.P) {
             SandHook.passApiCheck();

@@ -97,6 +97,7 @@ bool doHookWithReplacement(JNIEnv* env,
     SandHook::HookTrampoline* hookTrampoline = trampolineManager.installReplacementTrampoline(originMethod, hookMethod, backupMethod);
     if (hookTrampoline != nullptr) {
         originMethod->setQuickCodeEntry(hookTrampoline->replacement->getCode());
+        LOGD("set origin method quick code entry:%p",hookTrampoline->replacement->getCode());
         void* entryPointFormInterpreter = hookMethod->getInterpreterCodeEntry();
         if (entryPointFormInterpreter != NULL) {
             LOGD("originMethod->setInterpreterCodeEntry:%p",entryPointFormInterpreter);
@@ -601,4 +602,11 @@ JNIEXPORT bool JNI_Load_Ex(JNIEnv* env, jclass classSandHook, jclass classNeverC
 
     LOGW("JNI Loaded");
     return true;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_swift_sandhook_SandHook_forbidUseNterp(JNIEnv *env, jclass clazz) {
+    bool forbidUseNterpRes = forbidUseNterp();
+    LOGD("forbidUseNterp hook result:%s",forbidUseNterpRes ? "true" : "false");
 }
