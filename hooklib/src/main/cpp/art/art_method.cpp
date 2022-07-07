@@ -195,6 +195,7 @@ void ArtMethod::flushCache() {
 }
 
 void ArtMethod::backup(ArtMethod *backup) {
+    // TODO https://github.com/canyie/pine/blob/b971bf658891c0cedb089fdd95d9e1604d12f8e2/core/src/main/cpp/art/art_method.cpp#L214
     memcpy(backup, this, size());
 }
 

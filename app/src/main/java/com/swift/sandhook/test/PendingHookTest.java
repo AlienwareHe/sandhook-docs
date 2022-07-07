@@ -2,6 +2,7 @@ package com.swift.sandhook.test;
 
 import android.util.Log;
 
+import com.swift.sandhook.LogTags;
 import com.swift.sandhook.MyApp;
 
 public class PendingHookTest {
@@ -13,7 +14,7 @@ public class PendingHookTest {
     }
 
     public static void test() {
-        Log.e("PendingHookTest", "hook failure!");
+        Log.e(LogTags.ORIGIN, "hook failure!");
     }
 
 }

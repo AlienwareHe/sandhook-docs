@@ -1,6 +1,11 @@
 # SandHook
 - Android ART Hook
 - Native Inline Hook
+
+# changes
+- 支持android 12/12.1 [doing]
+- 部分调整和注释
+
 ## Version 
 
 [ ![Version](https://api.bintray.com/packages/ganyao114/maven/hooklib/images/download.svg) ](https://bintray.com/ganyao114/maven/hooklib/_latestVersion)

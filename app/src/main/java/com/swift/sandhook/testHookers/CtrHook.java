@@ -2,6 +2,7 @@ package com.swift.sandhook.testHookers;
 
 import android.util.Log;
 
+import com.swift.sandhook.LogTags;
 import com.swift.sandhook.SandHook;
 import com.swift.sandhook.annotation.HookClass;
 import com.swift.sandhook.annotation.HookMethod;
@@ -30,14 +31,14 @@ public class CtrHook {
 
     @HookMethod
     public static void onCtr(@ThisObject TestClass thiz, int a) throws Throwable {
-        Log.e("TestClassHook", "TestClass(int) been hooked");
+        Log.e(LogTags.HOOK_IN, "TestClass(int) been hooked");
         SandHook.callOriginByBackup(ctrbackup, thiz, a);
     }
 
     @HookMethod("add1")
     @HookMode(HookMode.INLINE)
     public static void onAdd1(TestClass thiz) throws Throwable {
-        Log.e("TestClassHook", "add1 been hooked");
+        Log.e(LogTags.HOOK_IN, "add1 been hooked");
         try {
             SandHook.callOriginByBackup(add1backup, thiz);
         } catch (Exception e) {
@@ -47,6 +48,7 @@ public class CtrHook {
 
     @HookMethod("add2")
     public static void onAdd2(TestClass thiz) throws  Throwable {
+        Log.e(LogTags.HOOK_IN,"add2 been hooked");
         SandHook.callOriginByBackup(add2backup, thiz);
     }
 

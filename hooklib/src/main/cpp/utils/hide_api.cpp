@@ -517,7 +517,7 @@ extern "C" {
     bool forbidUseNterp() {
         // bool art::interpreter::CanRuntimeUseNterp(art::interpreter *this)
         void * symbol = getSymCompat(art_lib_path,"_ZN3art11interpreter18CanRuntimeUseNterpEv");
-        if(hook_native(symbol,reinterpret_cast<void *>(newSupportNterp))){
+        if(symbol && hook_native(symbol,reinterpret_cast<void *>(newSupportNterp))){
             return true;
         }else{
             return false;

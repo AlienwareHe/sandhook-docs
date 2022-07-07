@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.swift.sandhook.LogTags;
 import com.swift.sandhook.SandHook;
 import com.swift.sandhook.annotation.HookClass;
 import com.swift.sandhook.annotation.HookMethod;
@@ -27,13 +28,13 @@ public class ActivityHooker {
     @HookMethod("onCreate")
     @MethodParams(Bundle.class)
     public static void onCreate(Activity thiz, Bundle bundle) throws Throwable {
-        Log.e("ActivityHooker", "hooked onCreate success " + thiz);
+        Log.e(LogTags.HOOK_IN, "hooked onCreate success " + thiz);
         SandHook.callOriginByBackup(onCreateBackup, thiz, bundle);
     }
 
     @HookMethod("onPause")
     public static void onPause(@ThisObject Activity thiz) throws Throwable {
-        Log.e("ActivityHooker", "hooked onPause success " + thiz);
+        Log.e(LogTags.HOOK_IN, "hooked onPause success " + thiz);
         onPauseBackup.callOrigin(thiz);
     }
 

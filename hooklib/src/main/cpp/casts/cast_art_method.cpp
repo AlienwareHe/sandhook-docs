@@ -150,6 +150,10 @@ namespace SandHook {
     class CastDexMethodIndex : public IMember<art::mirror::ArtMethod, uint32_t> {
     protected:
         Size calOffset(JNIEnv *jniEnv, art::mirror::ArtMethod *p) override {
+            if (SDK_INT >= ANDROID_R) {
+                return CastArtMethod::accessFlag->getOffset()
+                       + CastArtMethod::accessFlag->size();
+            }
             if (SDK_INT >= ANDROID_P) {
                 return CastArtMethod::accessFlag->getOffset()
                 + CastArtMethod::accessFlag->size()
@@ -222,6 +226,7 @@ namespace SandHook {
 
         hotnessCount = new CastHotnessCount();
         hotnessCount->init(env, m1, size);
+        LOGD("hotnessCount offset:%zu",hotnessCount->getOffset());
 
         auto neverCallTestClass = "com.swift.sandhook.ClassNeverCall";
 

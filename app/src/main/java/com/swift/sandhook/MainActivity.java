@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         final TestClass str = new TestClass(1);
 
-//        str.add1();
+        str.add1();
         str.add2();
         str.testNewHookApi(this, 1);
 
@@ -93,8 +93,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (Throwable e) {
 
         }
-
-//        NativeHookTest.hook();
     }
 
     public static Field getField(Class topClass, String fieldName) throws NoSuchFieldException {
@@ -129,17 +127,17 @@ public class MainActivity extends AppCompatActivity {
     public static int methodBeHooked(int a, int b) {
         a = a + 1 + 2;
         b = b + a + 3;
-        Log.e(TAG, "call methodBeHooked origin");
+        Log.e(LogTags.ORIGIN, "call methodBeHooked origin");
         return a + b;
     }
 
     public int testPluginHook(TestClass testClass) {
-        Log.e(TAG, "call testPluginHook origin");
+        Log.e(LogTags.ORIGIN, "call testPluginHook origin");
         return testClass.a;
     }
 
     public Integer testStub(TestClass testClass, int a, String b, boolean c, char d, String e) {
-        Log.e(TAG, "call testStub origin" + a + ("" + c) + d + e);
+        Log.e(LogTags.ORIGIN, "call testStub origin" + a + ("" + c) + d + e);
         return a;
     }
 
@@ -152,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            new TestClass(1).add2();
             return true;
         }
 

@@ -2,6 +2,7 @@ package com.swift.sandhook.testHookers;
 
 import android.util.Log;
 
+import com.swift.sandhook.LogTags;
 import com.swift.sandhook.MainActivity;
 import com.swift.sandhook.annotation.HookClass;
 import com.swift.sandhook.annotation.HookMethod;
@@ -20,7 +21,7 @@ public class CustmizeHooker {
     @HookMethod("methodBeHooked")
     @MethodParams({int.class, int.class})
     public static int staticMethodHooked(int a, int b) {
-        Log.e("CustmizeHooker", "methodBeHooked be hooked");
+        Log.e(LogTags.HOOK_IN, "methodBeHooked be hooked");
         try {
             return (int) backup.invoke(null, a, b);
         } catch (Exception e) {

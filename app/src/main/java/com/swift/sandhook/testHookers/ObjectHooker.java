@@ -2,6 +2,7 @@ package com.swift.sandhook.testHookers;
 
 import android.util.Log;
 
+import com.swift.sandhook.LogTags;
 import com.swift.sandhook.annotation.HookClass;
 import com.swift.sandhook.annotation.HookMethod;
 import com.swift.sandhook.annotation.HookMethodBackup;
@@ -17,7 +18,7 @@ public class ObjectHooker {
     @HookMethod("toString")
     @HookMode(HookMode.INLINE)
     public static String toStr(Object thiz) throws Throwable {
-        Log.e("ObjectHooker", "hooked success ");
+        Log.e(LogTags.HOOK_IN, "Object#toString hooked success ");
         return (String) toStrHook.callOrigin(thiz);
     }
 

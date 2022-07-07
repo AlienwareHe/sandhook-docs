@@ -3,6 +3,7 @@ package com.swift.sandhook.testHookers;
 import android.app.Activity;
 import android.util.Log;
 
+import com.swift.sandhook.LogTags;
 import com.swift.sandhook.SandHook;
 import com.swift.sandhook.annotation.HookClass;
 import com.swift.sandhook.annotation.HookMethod;
@@ -23,7 +24,7 @@ public class NewAnnotationApiHooker {
 
     @HookMethod("testNewHookApi")
     public static void onTestNewHookApi(@ThisObject TestClass thiz, @Param("com.swift.sandhook.MainActivity") Activity activity, int a) throws Throwable {
-        Log.e("TestClassHook", "testNewHookApi been hooked");
+        Log.e(LogTags.HOOK_IN, "testNewHookApi been hooked");
         SandHook.callOriginByBackup(backup, thiz, activity, a);
     }
 

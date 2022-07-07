@@ -77,7 +77,7 @@ public final class DynamicBridge {
                         new ProxyClassLoader(DynamicBridge.class.getClassLoader(), hookMethod.getDeclaringClass().getClassLoader()), dexDir == null ? null : dexDir.getAbsolutePath());
                 hookedInfo.put(hookMethod, hookMaker.getCallBackupMethod());
             }
-            DexLog.d("hook method <" + hookMethod.toString() + "> cost " + (System.currentTimeMillis() - timeStart) + " ms, by " + (stub != null ? "internal stub" : hookMaker.getClass().getSimpleName()));
+            DexLog.d("hook method <" + hookMethod + "> cost " + (System.currentTimeMillis() - timeStart) + " ms, by " + (stub != null ? ("internal stub:" + stub.hook) : hookMaker.getClass().getSimpleName()));
             Trace.endSection();
         } catch (Throwable e) {
             DexLog.e("error occur when hook method <" + hookMethod.toString() + ">", e);

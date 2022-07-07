@@ -1,5 +1,8 @@
 package com.swift.sandhook.test;
 
+import android.util.Log;
+
+import com.swift.sandhook.LogTags;
 import com.swift.sandhook.MainActivity;
 
 public class TestClass {
@@ -20,6 +23,7 @@ public class TestClass {
     public void add2 () {
         a++;
         b++;
+        Log.i(LogTags.ORIGIN,"add2 result:" + (a+b));
     }
 
     public void testNewHookApi (MainActivity activity, int x) {

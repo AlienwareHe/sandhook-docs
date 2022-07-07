@@ -2,6 +2,7 @@ package com.swift.sandhook.testHookers;
 
 import android.util.Log;
 
+import com.swift.sandhook.LogTags;
 import com.swift.sandhook.SandHook;
 import com.swift.sandhook.annotation.HookClass;
 import com.swift.sandhook.annotation.HookMethod;
@@ -20,7 +21,7 @@ public class LogHooker {
 
     @HookMethod("w")
     public static int onCreate(String tag, @Param("java.lang.String") Object msg) throws Throwable {
-        Log.e("LogHooker", "hooked success " + tag);
+        Log.e(LogTags.HOOK_IN, "Log#w hooked success " + tag);
         return (int) SandHook.callOriginByBackup(backup, null, tag, msg);
     }
 

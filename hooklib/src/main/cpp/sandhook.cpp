@@ -66,28 +66,32 @@ bool doHookWithReplacement(JNIEnv* env,
                            art::mirror::ArtMethod *hookMethod,
                            art::mirror::ArtMethod *backupMethod) {
 
-    if (!hookMethod->compile(env)) {
-        hookMethod->disableCompilable();
-    }
+//    if (!hookMethod->compile(env)) {
+//        hookMethod->disableCompilable();
+//    }
 
     if (SDK_INT > ANDROID_N && SDK_INT < ANDROID_Q) {
         forceProcessProfiles();
     }
+
     if ((SDK_INT >= ANDROID_N && SDK_INT <= ANDROID_P)
         || (SDK_INT >= ANDROID_Q && !originMethod->isAbstract())) {
         originMethod->setHotnessCount(0);
     }
 
+    originMethod->disableCompilable();
+    hookMethod->disableCompilable();
+
     if (backupMethod != nullptr) {
         originMethod->backup(backupMethod);
         backupMethod->disableCompilable();
         if (!backupMethod->isStatic()) {
+            // Non-static method, set kAccPrivate to ensure it will be invoked like a direct method.
             backupMethod->setPrivate();
         }
         backupMethod->flushCache();
     }
 
-    originMethod->disableCompilable();
     hookMethod->disableCompilable();
     hookMethod->flushCache();
 
