@@ -20,7 +20,7 @@ android {
 
     externalNativeBuild {
         cmake {
-            path file('CMakeLists.txt')
+            path file('src/main/cpp/CMakeLists.txt')
         }
     }
 
@@ -38,8 +38,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     // Android Studio Library Module c++ Debug 的坑 https://www.jianshu.com/p/81c1c147cc18
-    debugImplementation project(':hooklib')
+    // debugImplementation project(':hooklib')
     debugImplementation project(':nativehook')
+    api project(':annotation')
     implementation project(':xposedcompat')
-    //implementation project(':xposedcompat_new')
+    // implementation project(':xposedcompat_new')
 }

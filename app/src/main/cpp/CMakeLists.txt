@@ -7,13 +7,37 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 # Declares and names the project.
-
 project("app")
+
+ENABLE_LANGUAGE(ASM)
+
+add_definitions(-std=c++11)
+
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
+
+set(${PROJECT_NAME}_SOURCES
+        sandhook.cpp
+        trampoline/trampoline.cpp
+        trampoline/trampoline_manager.cpp
+        utils/dlfcn_nougat.cpp
+        utils/hide_api.cpp
+        utils/utils.cpp
+        utils/offset.cpp
+        utils/elf_util.cpp
+        casts/cast_art_method.cpp
+        casts/cast_compiler_options.cpp
+        art/art_method.cpp
+        art/art_compiler_options.cpp
+        trampoline/arch/arm32.S
+        trampoline/arch/arm64.S
+        inst/insts_arm32.cpp
+        inst/insts_arm64.cpp
+        nativehook/native_hook.cpp
+        )
 
 add_library( # Sets the name of the library.
         app
@@ -22,12 +46,13 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        src/main/cpp/native-lib.cpp
+        native-lib.cpp
+        ${${PROJECT_NAME}_SOURCES}
         )
 
 include_directories(
-        src/main/cpp
-        ../nativehook/src/main/cpp
+        .
+        ../../../../nativehook/src/main/cpp
 )
 
 add_library(sandhook-native
@@ -36,7 +61,7 @@ add_library(sandhook-native
 
 set_target_properties(sandhook-native
         PROPERTIES IMPORTED_LOCATION
-        ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libsandhook-native.so)
+        ${CMAKE_SOURCE_DIR}/../jniLibs/${ANDROID_ABI}/libsandhook-native.so)
 
 
 # Searches for a specified prebuilt library and stores the path as a
