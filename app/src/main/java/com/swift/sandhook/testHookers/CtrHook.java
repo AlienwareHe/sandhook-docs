@@ -17,10 +17,6 @@ import java.lang.reflect.Method;
 @HookClass(TestClass.class)
 public class CtrHook {
 
-    @HookMethodBackup
-    @SkipParamCheck
-    static Method ctrbackup;
-
     @HookMethodBackup("add1")
     @SkipParamCheck
     static Method add1backup;
@@ -29,18 +25,14 @@ public class CtrHook {
     @SkipParamCheck
     static Method add2backup;
 
-    @HookMethod
-    public static void onCtr(@ThisObject TestClass thiz, int a) throws Throwable {
-        Log.e(LogTags.HOOK_IN, "TestClass(int) been hooked");
-        SandHook.callOriginByBackup(ctrbackup, thiz, a);
-    }
 
     @HookMethod("add1")
     @HookMode(HookMode.INLINE)
     public static void onAdd1(TestClass thiz) throws Throwable {
-        Log.e(LogTags.HOOK_IN, "add1 been hooked");
+        Log.e(LogTags.HOOK_IN, "[4] ObjectMethod inline mode hook success");
         try {
             SandHook.callOriginByBackup(add1backup, thiz);
+            Log.e(LogTags.HOOK_IN, "[20]ObjectMethod inline mode call origin success");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,8 +40,9 @@ public class CtrHook {
 
     @HookMethod("add2")
     public static void onAdd2(TestClass thiz) throws  Throwable {
-        Log.e(LogTags.HOOK_IN,"add2 been hooked");
+        Log.e(LogTags.HOOK_IN, "[18]ObjectMethod default mode hook success");
         SandHook.callOriginByBackup(add2backup, thiz);
+        Log.e(LogTags.HOOK_IN, "[19]ObjectMethod default mode call origin success");
     }
 
 

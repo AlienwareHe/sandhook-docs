@@ -23,9 +23,10 @@ public class JniHooker {
 
     @HookMethod("jni_test")
     public static void onJni(@ThisObject TestClass thiz) throws Throwable {
-        Log.e(LogTags.HOOK_IN, "JniHooker hooked success ");
+        Log.e(LogTags.HOOK_IN, "[0] JniHooker hooked success");
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
             SandHook.callOriginByBackup(backup, thiz);
+            Log.e(LogTags.HOOK_IN, "[1] JniHooker call origin success");
         }
     }
 

@@ -18,7 +18,7 @@ public class ObjectHooker {
     @HookMethod("toString")
     @HookMode(HookMode.INLINE)
     public static String toStr(Object thiz) throws Throwable {
-        Log.e(LogTags.HOOK_IN, "Object#toString hooked success ");
+        Log.e(LogTags.HOOK_IN, "[7] Object#toString hooked success ");
         return (String) toStrHook.callOrigin(thiz);
     }
 

@@ -83,13 +83,13 @@ public class MyApp extends Application {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
-                    Log.e(LogTags.HOOK_IN, "Activity onResume beforeHookedMethod: " + param.method.getName());
+                    Log.e(LogTags.HOOK_IN, "[8] Activity onResume beforeHookedMethod: " + param.method.getName());
                 }
 
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
-                    Log.e(LogTags.HOOK_IN, "Activity onResume afterHookedMethod: " + param.method.getName());
+                    Log.e(LogTags.HOOK_IN, "[9] Activity onResume afterHookedMethod: " + param.method.getName());
                 }
             });
 
@@ -99,26 +99,27 @@ public class MyApp extends Application {
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
                     param.args[1] = 2;
-                    Log.e(LogTags.HOOK_IN, "MainActivity#testStub beforeHookedMethod: " + param.method.getName());
+                    Log.e(LogTags.HOOK_IN, "[10] MainActivity#testStub beforeHookedMethod: " + param.method.getName());
                 }
 
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
-                    Log.e(LogTags.HOOK_IN, "MainActivity#testStub afterHookedMethod: " + param.method.getName());
+                    Log.e(LogTags.HOOK_IN, "[11] MainActivity#testStub afterHookedMethod: " + param.method.getName());
                 }
             });
 
             XposedHelpers.findAndHookMethod(PendingHookTest.class, "test", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    Log.i(LogTags.HOOK_IN, "pendingTest hooked before");
+                    Log.i(LogTags.HOOK_IN, "[12] StaticMethod pendingHookTest hooked success before");
                     super.beforeHookedMethod(param);
                     param.returnEarly = true;
                 }
 
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Log.i(LogTags.HOOK_IN, "[13] StaticMethod pendingHookTest hooked success after");
                     super.afterHookedMethod(param);
                 }
             });
@@ -126,14 +127,28 @@ public class MyApp extends Application {
             XposedBridge.hookAllConstructors(Thread.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    Log.i(LogTags.HOOK_IN, "thread constructor hooked before:" + param.method);
+                    Log.i(LogTags.HOOK_IN, "[14] SystemConstructor Thread hooked success before:" + param.method);
                     super.beforeHookedMethod(param);
                 }
 
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
-                    Log.i(LogTags.HOOK_IN, "thread constructor hooked after:" + param.method);
+                    Log.i(LogTags.HOOK_IN, "[15] SystemConstructor Thread hooked success after:" + param.method);
+                }
+            });
+
+            XposedBridge.hookAllConstructors(TestClass.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    Log.i(LogTags.HOOK_IN, "[16] Constructor TestClass hooked success before:" + param.method);
+                    super.beforeHookedMethod(param);
+                }
+
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    Log.i(LogTags.HOOK_IN, "[17] Constructor TestClass hooked success after:" + param.method);
                 }
             });
         } catch (Throwable e) {

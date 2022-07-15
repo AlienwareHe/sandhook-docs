@@ -21,7 +21,7 @@ public class LogHooker {
 
     @HookMethod("w")
     public static int onCreate(String tag, @Param("java.lang.String") Object msg) throws Throwable {
-        Log.e(LogTags.HOOK_IN, "Log#w hooked success " + tag);
+        Log.e(LogTags.HOOK_IN, "[2] SystemObjectMethod Log#w hooked success " + tag);
         return (int) SandHook.callOriginByBackup(backup, null, tag, msg);
     }
 

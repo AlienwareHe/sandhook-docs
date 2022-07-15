@@ -55,11 +55,17 @@ extern "C" {
 
     bool (*origin_ShouldUseInterpreterEntrypoint)(ArtMethod *artMethod, const void* quick_code) = nullptr;
     bool replace_ShouldUseInterpreterEntrypoint(ArtMethod *artMethod, const void* quick_code) {
+        LOGD("ShouldUseInterpreterEntrypoint!!!!!!!!!");
         if ((SandHook::TrampolineManager::get().methodHooked(artMethod) || isPending(artMethod)) && quick_code != nullptr) {
+            LOGD("No ShouldUseInterpreterEntrypoint: %s",prettyMethod(artMethod, true).c_str());
             return false;
         }
-        return origin_ShouldUseInterpreterEntrypoint(artMethod, quick_code);
+        bool shouldUse = origin_ShouldUseInterpreterEntrypoint(artMethod, quick_code);
+        LOGD("ShouldUseInterpreterEntrypoint: %s,result:%d", prettyMethod(artMethod, true).c_str(),shouldUse);
+        return shouldUse;
     }
+
+    std::string (*PrettyMethod)(void * art_method, bool with_signature);
 
     int replace_hidden_api(){
         return 0;
@@ -114,6 +120,16 @@ extern "C" {
                 jit_lib_path = "/system/lib/libart-compiler.so";
             }
         }
+
+        PrettyMethod = reinterpret_cast<std::string (*)(void *, bool)>(getSymCompat(art_lib_path,"_ZN3art9ArtMethod12PrettyMethodEPS0_b"));
+        if(!PrettyMethod){
+            PrettyMethod = reinterpret_cast<std::string (*)(void *, bool)>(getSymCompat(art_lib_path,"_ZN3art12PrettyMethodEPNS_9ArtMethodEb"));
+        }
+        if(!PrettyMethod){
+            PrettyMethod = reinterpret_cast<std::string (*)(void *, bool)>(getSymCompat(art_lib_path,"_ZN3art12PrettyMethodEPNS_6mirror9ArtMethodEb"));
+        }
+        LOGD("found libart PrettyMethod symbol:%p",PrettyMethod);
+
 
         //init compile
         if (SDK_INT >= ANDROID_N) {
@@ -201,6 +217,7 @@ extern "C" {
                                                                            jmethodID)>(hook_native(
                         decodeArtMethod,
                         reinterpret_cast<void *>(replace_DecodeArtMethodId)));
+                LOGD("libart DecodeGenericId hook:%d",origin_DecodeArtMethodId == nullptr);
             }
             void *shouldUseInterpreterEntrypoint = getSymCompat(art_lib_path,
                                                                 "_ZN3art11ClassLinker30ShouldUseInterpreterEntrypointEPNS_9ArtMethodEPKv");
@@ -209,6 +226,7 @@ extern "C" {
                                                                                   const void *)>(hook_native(
                         shouldUseInterpreterEntrypoint,
                         reinterpret_cast<void *>(replace_ShouldUseInterpreterEntrypoint)));
+                LOGD("libart ShouldUseInterpreterEntrypoint hook:%p",origin_ShouldUseInterpreterEntrypoint);
             }
         }
 
@@ -522,6 +540,13 @@ extern "C" {
         }else{
             return false;
         }
+    }
+
+    std::string prettyMethod(void * art_method,bool with_signature){
+        if(PrettyMethod){
+            return PrettyMethod(art_method,with_signature);
+        }
+        return "";
     }
 }
 

@@ -59,8 +59,11 @@ public class MainActivity extends AppCompatActivity {
 
         final TestClass str = new TestClass(1);
 
-        str.add1();
+        //str.add1();
+
+        //XposedHelpers.callMethod(str,"add2");
         str.add2();
+
         str.testNewHookApi(this, 1);
 
         str.jni_test();

@@ -21,11 +21,11 @@ public class CustmizeHooker {
     @HookMethod("methodBeHooked")
     @MethodParams({int.class, int.class})
     public static int staticMethodHooked(int a, int b) {
-        Log.e(LogTags.HOOK_IN, "methodBeHooked be hooked");
+        Log.e(LogTags.HOOK_IN, "[3] StaticMethod methodBeHooked hook success");
         try {
             return (int) backup.invoke(null, a, b);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(LogTags.HOOK_IN, "StaticMethod methodBeHooked call origin failed:", e);
         }
         return 0;
     }
