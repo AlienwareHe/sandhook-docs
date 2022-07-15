@@ -61,6 +61,8 @@ extern "C" {
 
     bool forbidUseNterp();
 
+    std::string prettyMethod(void * art_method,bool with_signature);
+
 }
 
 #endif //SANDHOOK_HIDE_API_H

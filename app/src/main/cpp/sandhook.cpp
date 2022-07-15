@@ -66,9 +66,9 @@ bool doHookWithReplacement(JNIEnv* env,
                            art::mirror::ArtMethod *hookMethod,
                            art::mirror::ArtMethod *backupMethod) {
 
-//    if (!hookMethod->compile(env)) {
-//        hookMethod->disableCompilable();
-//    }
+    if (!hookMethod->compile(env)) {
+        hookMethod->disableCompilable();
+    }
 
     if (SDK_INT > ANDROID_N && SDK_INT < ANDROID_Q) {
         forceProcessProfiles();

@@ -8,4 +8,6 @@ package com.swift.sandhook;
 public class NativeHookTest {
 
     public static native void hook();
+
+    public static native boolean exec();
 }

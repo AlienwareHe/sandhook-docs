@@ -60,3 +60,8 @@ Java_com_swift_sandhook_NativeHookTest_hook(JNIEnv *env, jclass clazz) {
         }
     }
 }
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_swift_sandhook_NativeHookTest_exec(JNIEnv *env, jclass clazz) {
+    return false;
+}
