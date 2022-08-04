@@ -1,5 +1,6 @@
 package com.swift.sandhook;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         StringBuilder hookTestResult = new StringBuilder();
+        hookTestResult.append("当前安卓版本：").append(Build.VERSION.SDK_INT).append(":").append(Build.VERSION.PREVIEW_SDK_INT).append("\r\n");
         hookTestResult.append("静态方法Hook：").append(HookPass.getStaticMethodHookResult()).append("\r\n");
         hookTestResult.append("JNI方法Hook：").append(HookPass.getJniMethodHookResult()).append("\r\n");
         hookTestResult.append("App实例方法Hook：").append(HookPass.getAppMethodHookResult()).append("\r\n");
