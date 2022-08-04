@@ -55,14 +55,56 @@ extern "C" {
 
     bool (*origin_ShouldUseInterpreterEntrypoint)(ArtMethod *artMethod, const void* quick_code) = nullptr;
     bool replace_ShouldUseInterpreterEntrypoint(ArtMethod *artMethod, const void* quick_code) {
+        LOGD("ShouldUseInterpreterEntrypoint!!!!!!!!!");
         if ((SandHook::TrampolineManager::get().methodHooked(artMethod) || isPending(artMethod)) && quick_code != nullptr) {
+            LOGD("No ShouldUseInterpreterEntrypoint: %s",prettyMethod(artMethod, true).c_str());
             return false;
         }
-        return origin_ShouldUseInterpreterEntrypoint(artMethod, quick_code);
+        bool shouldUse = origin_ShouldUseInterpreterEntrypoint(artMethod, quick_code);
+        LOGD("ShouldUseInterpreterEntrypoint: %s,result:%d", prettyMethod(artMethod, true).c_str(),shouldUse);
+        return shouldUse;
     }
+
+    std::string (*PrettyMethod)(void * art_method, bool with_signature);
+
+    void (*SetJavaDebuggable)(void * runtime_instance,bool debuggable);
 
     int replace_hidden_api(){
         return 0;
+    }
+
+    inline bool IsJavaDebuggable(JNIEnv *env) {
+        static auto kDebuggable = [&env]() {
+            if (SDK_INT < __ANDROID_API_P__) {
+                return false;
+            }
+            auto runtime_class = env->FindClass("dalvik/system/VMRuntime");
+            if (!runtime_class) {
+                LOGE("Failed to find VMRuntime");
+                return false;
+            }
+            auto get_runtime_method = env->GetStaticMethodID(runtime_class, "getRuntime",
+                                                            "()Ldalvik/system/VMRuntime;");
+            if (!get_runtime_method) {
+                LOGE("Failed to find VMRuntime.getRuntime()");
+                return false;
+            }
+            auto runtime = env->CallStaticObjectMethod(runtime_class, get_runtime_method);
+            if (!runtime) {
+                LOGE("Failed to get VMRuntime");
+                return false;
+            }
+            auto is_debuggable_method =
+                    env->GetMethodID(runtime_class, "isJavaDebuggable", "()Z");
+            if (!is_debuggable_method) {
+                LOGE("Failed to find VMRuntime.isJavaDebuggable()");
+                return false;
+            }
+            bool is_debuggable = env->CallBooleanMethod(runtime, is_debuggable_method);
+            LOGD("java runtime debuggable %s", is_debuggable ? "true" : "false");
+            return is_debuggable;
+        }();
+        return kDebuggable;
     }
 
     // paths
@@ -115,6 +157,16 @@ extern "C" {
             }
         }
 
+        PrettyMethod = reinterpret_cast<std::string (*)(void *, bool)>(getSymCompat(art_lib_path,"_ZN3art9ArtMethod12PrettyMethodEPS0_b"));
+        if(!PrettyMethod){
+            PrettyMethod = reinterpret_cast<std::string (*)(void *, bool)>(getSymCompat(art_lib_path,"_ZN3art12PrettyMethodEPNS_9ArtMethodEb"));
+        }
+        if(!PrettyMethod){
+            PrettyMethod = reinterpret_cast<std::string (*)(void *, bool)>(getSymCompat(art_lib_path,"_ZN3art12PrettyMethodEPNS_6mirror9ArtMethodEb"));
+        }
+        LOGD("found libart PrettyMethod symbol:%p",PrettyMethod);
+
+
         //init compile
         if (SDK_INT >= ANDROID_N) {
             if (SDK_INT >= ANDROID_R) {
@@ -160,6 +212,7 @@ extern "C" {
         innerResumeVM = reinterpret_cast<void (*)()>(getSymCompat(art_lib_path,
                                                                         "_ZN3art3Dbg8ResumeVMEv"));
 
+        runtime_instance_ = *reinterpret_cast<void**>(getSymCompat(art_lib_path, "_ZN3art7Runtime9instance_E"));
 
         //init for getObject & JitCompiler
         const char* add_weak_ref_sym;
@@ -201,7 +254,9 @@ extern "C" {
                                                                            jmethodID)>(hook_native(
                         decodeArtMethod,
                         reinterpret_cast<void *>(replace_DecodeArtMethodId)));
+                LOGD("libart DecodeGenericId hook:%d",origin_DecodeArtMethodId == nullptr);
             }
+
             void *shouldUseInterpreterEntrypoint = getSymCompat(art_lib_path,
                                                                 "_ZN3art11ClassLinker30ShouldUseInterpreterEntrypointEPNS_9ArtMethodEPKv");
             if (shouldUseInterpreterEntrypoint != nullptr) {
@@ -209,7 +264,23 @@ extern "C" {
                                                                                   const void *)>(hook_native(
                         shouldUseInterpreterEntrypoint,
                         reinterpret_cast<void *>(replace_ShouldUseInterpreterEntrypoint)));
+                LOGD("libart ShouldUseInterpreterEntrypoint hook:%p",origin_ShouldUseInterpreterEntrypoint);
             }
+
+            // TODO: need to fix isJavaDebuggable
+            // TODO: Lsplant里Instrumentation::Init作用 如果是JavaDebubgable，如果更新ArtMethod入口，那么不修改hook的，而是修改backup的
+            // If ShouldUseInterpreter inlined , setJavaDebuggable to False to avoid use interpreter
+            // 如果javaDebuggable为true，那么一定不会使用aotCode作为方法入口，那么方法就会被解释执行从而入口替换失效 canUseAotCode(https://cs.android.com/android/platform/superproject/+/master:art/runtime/instrumentation.cc;drc=515ab03a9a7777dfd47ce486f50cb8a2a0a8640f;bpv=1;bpt=1;l=294)
+            //if(IsJavaDebuggable(env)){
+                if(!SetJavaDebuggable){
+                    SetJavaDebuggable = reinterpret_cast<void (*)(void *,bool )>(getSymCompat(art_lib_path,"_ZN3art7Runtime17SetJavaDebuggableEb"));
+                    LOGD("libart find Runtime SetJavaDebuggable method!");
+                }
+                if(SetJavaDebuggable){
+                    LOGD("libart set Runtime JavaDebuggable false");
+                    SetJavaDebuggable(runtime_instance_, false);
+                }
+            //}
         }
 
         if (SDK_INT >= ANDROID_Q && hook_native) {
@@ -229,8 +300,6 @@ extern "C" {
                 hook_native(hidden_api, reinterpret_cast<void*>(replace_hidden_api));
             }
         }
-
-        runtime_instance_ = *reinterpret_cast<void**>(getSymCompat(art_lib_path, "_ZN3art7Runtime9instance_E"));
     }
 
     bool canCompile() {
@@ -522,6 +591,13 @@ extern "C" {
         }else{
             return false;
         }
+    }
+
+    std::string prettyMethod(void * art_method,bool with_signature){
+        if(PrettyMethod){
+            return PrettyMethod(art_method,with_signature);
+        }
+        return "";
     }
 }
 
