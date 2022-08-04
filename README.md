@@ -3,8 +3,20 @@
 - Native Inline Hook
 
 # changes
-- 支持android 12/12.1 [doing]
+- 支持android 12/12.1/13
 - 部分调整和注释
+- 梳理美化Hook兼容测试报告
+    - 静态方法Hook
+    - JNI方法Hook
+    - APP类构造方法Hook
+    - 系统类构造方法Hook
+    - APP实例方法Hook
+    - 系统类实例方法Hook
+    - 实例方法Inline模式Hook
+    - 实例方法Replace模式Hook
+
+# 调试
+oatdump --oat-file=/data/app/~~_ZI_GvIjHlpeKZKaJXv2qA==/com.swift.sandhook-IwnNjGrPlokppLa3F94gPQ==/oat/arm64/base.odex --class-filter=com.swift.sandhook.test --output=oatdump.txt
 
 ## Version 
 

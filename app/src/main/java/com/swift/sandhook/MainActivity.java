@@ -1,5 +1,6 @@
 package com.swift.sandhook;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,13 +24,13 @@ import de.robv.android.xposed.XposedHelpers;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "SandHookTest";
-    
+
     Inter inter;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG,"MainActivity onCreate");
+        Log.i(TAG, "MainActivity onCreate");
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -43,67 +44,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        methodBeHooked(hashCode(), 1);
-
-
-        toolbar.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                methodBeHooked(hashCode(), 3);
-                Log.w(TAG, "dadadad");
-            }
-        }, 3000);
-
-        // Example of a call to a native method
+        StringBuilder hookTestResult = new StringBuilder();
+        hookTestResult.append("当前安卓版本：").append(Build.VERSION.SDK_INT).append(":").append(Build.VERSION.PREVIEW_SDK_INT).append("\r\n");
+        hookTestResult.append("静态方法Hook：").append(HookPass.getStaticMethodHookResult()).append("\r\n");
+        hookTestResult.append("JNI方法Hook：").append(HookPass.getJniMethodHookResult()).append("\r\n");
+        hookTestResult.append("App实例方法Hook：").append(HookPass.getAppMethodHookResult()).append("\r\n");
+        hookTestResult.append("系统类实例方法Hook：").append(HookPass.getSystemMethodHookResult()).append("\r\n");
+        hookTestResult.append("APP类构造方法Hook：").append(HookPass.getAppConstructorHookResult()).append("\r\n");
+        hookTestResult.append("系统类构造方法Hook：").append(HookPass.getSystemConstructorHookResult()).append("\r\n");
+        hookTestResult.append("实例方法Inline模式Hook：").append(HookPass.getInstanceMethodInlineResult()).append("\r\n");
+        hookTestResult.append("实例方法Replace模式Hook：").append(HookPass.getInstanceMethodReplaceResult()).append("\r\n");
         TextView tv = (TextView) findViewById(R.id.sample_text);
-
-        final TestClass str = new TestClass(1);
-
-        str.add1();
-        str.add2();
-        str.testNewHookApi(this, 1);
-
-        str.jni_test();
-
-        Log.e(TAG, str.a + "");
-
-        inter = new InterImpl();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                inter.dosth();
-                inter = new Inter() {
-                    @Override
-                    public void dosth() {
-                        Log.e(TAG, hashCode() + "");
-                    }
-                };
-                Log.e(TAG, "res = " + testStub(str, 1, "origin b", false, 'x', "origin e"));
-            }
-        }).start();
-
-        inter.dosth();
-
-        testPluginHook(str);
-
-        MyApp.initedTest = true;
-        try {
-            PendingHookTest.test();
-        } catch (Throwable e) {
-
-        }
-    }
-
-    public static Field getField(Class topClass, String fieldName) throws NoSuchFieldException {
-        while (topClass != null && topClass != Object.class) {
-            try {
-                return topClass.getDeclaredField(fieldName);
-            } catch (Exception e) {
-            }
-            topClass = topClass.getSuperclass();
-        }
-        throw new NoSuchFieldException(fieldName);
+        tv.setText(hookTestResult);
     }
 
     @Override
@@ -122,23 +74,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("dosth", hashCode() + "");
             }
         };
-    }
-
-    public static int methodBeHooked(int a, int b) {
-        a = a + 1 + 2;
-        b = b + a + 3;
-        Log.e(LogTags.ORIGIN, "call methodBeHooked origin");
-        return a + b;
-    }
-
-    public int testPluginHook(TestClass testClass) {
-        Log.e(LogTags.ORIGIN, "call testPluginHook origin");
-        return testClass.a;
-    }
-
-    public Integer testStub(TestClass testClass, int a, String b, boolean c, char d, String e) {
-        Log.e(LogTags.ORIGIN, "call testStub origin" + a + ("" + c) + d + e);
-        return a;
     }
 
     @Override

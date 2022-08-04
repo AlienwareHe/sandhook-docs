@@ -13,8 +13,8 @@ public class PendingHookTest {
         }
     }
 
-    public static void test() {
-        Log.e(LogTags.ORIGIN, "hook failure!");
+    public static boolean test() {
+        return false;
     }
 
 }
