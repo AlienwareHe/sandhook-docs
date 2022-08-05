@@ -44,15 +44,20 @@ void ArtMethod::disableCompilable() {
         return;
     uint32_t accessFlag = getAccessFlags();
     if (SDK_INT >= ANDROID_S) {
+        // kAccCompileDontBother
         accessFlag |= 0x02000000u;
+        // kAccPreCompiled
         accessFlag &= ~0x00800000u;
     } else if (SDK_INT >= ANDROID_R) {
+        // kAccCompileDontBother
         accessFlag |= 0x02000000u;
+        // kAccPreCompiled
         accessFlag &= ~0x00200000u;
     } else if (SDK_INT >= ANDROID_O2) {
         accessFlag |= 0x02000000u;
         accessFlag |= 0x00800000u;
     } else {
+        // kAccCompileDontBother
         accessFlag |= 0x01000000u;
     }
     setAccessFlags(accessFlag);
