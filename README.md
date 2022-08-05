@@ -3,7 +3,7 @@
 - Native Inline Hook
 
 # changes
-- 支持android 12/12.1/13
+- 支持android 12/12.1/13 改动见 https://mp.weixin.qq.com/s/IWBFTdfrzhax0CMgZYHNsQ
 - 部分调整和注释
 - 梳理美化Hook兼容测试报告
     - 静态方法Hook
