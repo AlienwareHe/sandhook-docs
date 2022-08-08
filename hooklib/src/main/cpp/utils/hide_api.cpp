@@ -473,7 +473,7 @@ extern "C" {
                 OFFSET_classlinker = 496;
             }
 #else
-            constexpr size_t OFFSET_classlinker = 276;
+            size_t OFFSET_classlinker = 276;
             if(SDK_INT >= ANDROID_S){
                 OFFSET_classlinker = 288;
             }
@@ -485,6 +485,7 @@ extern "C" {
     }
 
     bool hookClassInit(void(*callback)(void*)) {
+        LOGD("hook class init:%d",SDK_INT);
         if (SDK_INT >= ANDROID_R) {
             void *symMarkClassInitialized = getSymCompat(art_lib_path,
                                                            "_ZN3art11ClassLinker20MarkClassInitializedEPNS_6ThreadENS_6HandleINS_6mirror5ClassEEE");
@@ -517,8 +518,12 @@ extern "C" {
 
             if (backup_mark_class_initialized && backup_update_methods_code && (backup_fixup_static_trampolines_with_thread || backup_fixup_static_trampolines)) {
                 class_init_callback = callback;
+                LOGD("hook class init success, backup_mark_class_initialized:%p,backup_update_methods_code:%p,(backup_fixup_static_trampolines_with_thread || backup_fixup_static_trampolines):%p||%p",
+                     backup_mark_class_initialized,backup_update_methods_code,backup_fixup_static_trampolines_with_thread,backup_fixup_static_trampolines);
                 return true;
             } else {
+                LOGD("hook class init failed, backup_mark_class_initialized:%p,backup_update_methods_code:%p,(backup_fixup_static_trampolines_with_thread || backup_fixup_static_trampolines):%p||%p",
+                      backup_mark_class_initialized,backup_update_methods_code,backup_fixup_static_trampolines_with_thread,backup_fixup_static_trampolines);
                 return false;
             }
         } else {
