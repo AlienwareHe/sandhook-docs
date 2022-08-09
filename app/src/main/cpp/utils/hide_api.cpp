@@ -9,6 +9,7 @@
 #include "../includes/trampoline_manager.h"
 #include "../includes/art_runtime.h"
 #include "../includes/sandhook.h"
+#include "offset.cpp"
 #include <unordered_set>
 #include <mutex>
 
@@ -17,587 +18,699 @@ extern int SDK_INT;
 extern "C" {
 
 
-    void* jitCompilerHandle = nullptr;
-    bool (*jitCompileMethod)(void*, void*, void*, bool) = nullptr;
-    bool (*jitCompileMethodQ)(void*, void*, void*, bool, bool) = nullptr;
+void *jitCompilerHandle = nullptr;
+bool (*jitCompileMethod)(void *, void *, void *, bool) = nullptr;
+bool (*jitCompileMethodQ)(void *, void *, void *, bool, bool) = nullptr;
 
-    void (*innerSuspendVM)() = nullptr;
-    void (*innerResumeVM)() = nullptr;
+void (*innerSuspendVM)() = nullptr;
+void (*innerResumeVM)() = nullptr;
 
-    jobject (*addWeakGlobalRef)(JavaVM *, void *, void *) = nullptr;
+jobject (*addWeakGlobalRef)(JavaVM *, void *, void *) = nullptr;
 
-    art::jit::JitCompiler** globalJitCompileHandlerAddr = nullptr;
+art::jit::JitCompiler **globalJitCompileHandlerAddr = nullptr;
 
-    //for Android Q
-    void (**origin_jit_update_options)(void *) = nullptr;
+//for Android Q
+void (**origin_jit_update_options)(void *) = nullptr;
 
-    void (*profileSaver_ForceProcessProfiles)() = nullptr;
+void (*profileSaver_ForceProcessProfiles)() = nullptr;
 
-    //for Android R
-    void *jniIdManager = nullptr;
-    ArtMethod *(*origin_DecodeArtMethodId)(void *thiz, jmethodID jmethodId) = nullptr;
-    ArtMethod *replace_DecodeArtMethodId(void *thiz, jmethodID jmethodId) {
-        jniIdManager = thiz;
-        return origin_DecodeArtMethodId(thiz, jmethodId);
+//for Android R
+void *jniIdManager = nullptr;
+ArtMethod *(*origin_DecodeArtMethodId)(void *thiz, jmethodID jmethodId) = nullptr;
+ArtMethod *replace_DecodeArtMethodId(void *thiz, jmethodID jmethodId) {
+    jniIdManager = thiz;
+    return origin_DecodeArtMethodId(thiz, jmethodId);
+}
+
+std::unordered_set<ArtMethod *> pending_methods;
+std::mutex pending_mutex;
+void addPendingHookNative(ArtMethod *method) {
+    std::unique_lock<std::mutex> lk(pending_mutex);
+    pending_methods.insert(method);
+}
+
+bool isPending(ArtMethod *method) {
+    std::unique_lock<std::mutex> lk(pending_mutex);
+    return pending_methods.erase(method);
+}
+
+bool
+(*origin_ShouldUseInterpreterEntrypoint)(ArtMethod *artMethod, const void *quick_code) = nullptr;
+bool replace_ShouldUseInterpreterEntrypoint(ArtMethod *artMethod, const void *quick_code) {
+    LOGD("ShouldUseInterpreterEntrypoint!!!!!!!!!");
+    if ((SandHook::TrampolineManager::get().methodHooked(artMethod) || isPending(artMethod)) &&
+        quick_code != nullptr) {
+        LOGD("No ShouldUseInterpreterEntrypoint: %s", prettyMethod(artMethod, true).c_str());
+        return false;
     }
+    bool shouldUse = origin_ShouldUseInterpreterEntrypoint(artMethod, quick_code);
+    LOGD("ShouldUseInterpreterEntrypoint: %s,result:%d", prettyMethod(artMethod, true).c_str(),
+         shouldUse);
+    return shouldUse;
+}
 
-    std::unordered_set<ArtMethod*> pending_methods;
-    std::mutex pending_mutex;
-    void addPendingHookNative(ArtMethod *method) {
-        std::unique_lock<std::mutex> lk(pending_mutex);
-        pending_methods.insert(method);
-    }
+std::string (*PrettyMethod)(void *art_method, bool with_signature);
 
-    bool isPending(ArtMethod* method) {
-        std::unique_lock<std::mutex> lk(pending_mutex);
-        return pending_methods.erase(method);
-    }
+void (*SetJavaDebuggable)(void *runtime_instance, bool debuggable);
 
-    bool (*origin_ShouldUseInterpreterEntrypoint)(ArtMethod *artMethod, const void* quick_code) = nullptr;
-    bool replace_ShouldUseInterpreterEntrypoint(ArtMethod *artMethod, const void* quick_code) {
-        LOGD("ShouldUseInterpreterEntrypoint!!!!!!!!!");
-        if ((SandHook::TrampolineManager::get().methodHooked(artMethod) || isPending(artMethod)) && quick_code != nullptr) {
-            LOGD("No ShouldUseInterpreterEntrypoint: %s",prettyMethod(artMethod, true).c_str());
+int replace_hidden_api() {
+    return 0;
+}
+
+inline bool IsJavaDebuggable(JNIEnv *env) {
+    static auto kDebuggable = [&env]() {
+        if (SDK_INT < __ANDROID_API_P__) {
             return false;
         }
-        bool shouldUse = origin_ShouldUseInterpreterEntrypoint(artMethod, quick_code);
-        LOGD("ShouldUseInterpreterEntrypoint: %s,result:%d", prettyMethod(artMethod, true).c_str(),shouldUse);
-        return shouldUse;
-    }
-
-    std::string (*PrettyMethod)(void * art_method, bool with_signature);
-
-    void (*SetJavaDebuggable)(void * runtime_instance,bool debuggable);
-
-    int replace_hidden_api(){
-        return 0;
-    }
-
-    inline bool IsJavaDebuggable(JNIEnv *env) {
-        static auto kDebuggable = [&env]() {
-            if (SDK_INT < __ANDROID_API_P__) {
-                return false;
-            }
-            auto runtime_class = env->FindClass("dalvik/system/VMRuntime");
-            if (!runtime_class) {
-                LOGE("Failed to find VMRuntime");
-                return false;
-            }
-            auto get_runtime_method = env->GetStaticMethodID(runtime_class, "getRuntime",
-                                                            "()Ldalvik/system/VMRuntime;");
-            if (!get_runtime_method) {
-                LOGE("Failed to find VMRuntime.getRuntime()");
-                return false;
-            }
-            auto runtime = env->CallStaticObjectMethod(runtime_class, get_runtime_method);
-            if (!runtime) {
-                LOGE("Failed to get VMRuntime");
-                return false;
-            }
-            auto is_debuggable_method =
-                    env->GetMethodID(runtime_class, "isJavaDebuggable", "()Z");
-            if (!is_debuggable_method) {
-                LOGE("Failed to find VMRuntime.isJavaDebuggable()");
-                return false;
-            }
-            bool is_debuggable = env->CallBooleanMethod(runtime, is_debuggable_method);
-            LOGD("java runtime debuggable %s", is_debuggable ? "true" : "false");
-            return is_debuggable;
-        }();
-        return kDebuggable;
-    }
-
-    // paths
-    const char* art_lib_path;
-    const char* jit_lib_path;
-
-    JavaVM* jvm;
-
-    void *(*hook_native)(void* origin, void *replace) = nullptr;
-
-    void (*class_init_callback)(void*) = nullptr;
-
-    void (*backup_fixup_static_trampolines)(void *, void *) = nullptr;
-
-    void (*backup_fixup_static_trampolines_with_thread)(void *, void *, void*) = nullptr;
-
-    void *(*backup_mark_class_initialized)(void *, void *, uint32_t *) = nullptr;
-
-    void (*backup_update_methods_code)(void *, ArtMethod *, const void *) = nullptr;
-
-    void* (*make_initialized_classes_visibly_initialized_)(void*, void*, bool) = nullptr;
-
-    void* runtime_instance_ = nullptr;
-
-    void initHideApi(JNIEnv* env) {
-
-        env->GetJavaVM(&jvm);
-
-        if (BYTE_POINT == 8) {
-            if (SDK_INT >= ANDROID_R) {
-                art_lib_path = "/apex/com.android.art/lib64/libart.so";
-                jit_lib_path = "/apex/com.android.art/lib64/libart-compiler.so";
-            } else if (SDK_INT >= ANDROID_Q) {
-                art_lib_path = "/apex/com.android.runtime/lib64/libart.so";
-                jit_lib_path = "/apex/com.android.runtime/lib64/libart-compiler.so";
-            }  else {
-                art_lib_path = "/system/lib64/libart.so";
-                jit_lib_path = "/system/lib64/libart-compiler.so";
-            }
-        } else {
-            if (SDK_INT >= ANDROID_R) {
-                art_lib_path = "/apex/com.android.art/lib/libart.so";
-                jit_lib_path = "/apex/com.android.art/lib/libart-compiler.so";
-            } else if (SDK_INT >= ANDROID_Q) {
-                art_lib_path = "/apex/com.android.runtime/lib/libart.so";
-                jit_lib_path = "/apex/com.android.runtime/lib/libart-compiler.so";
-            }  else {
-                art_lib_path = "/system/lib/libart.so";
-                jit_lib_path = "/system/lib/libart-compiler.so";
-            }
-        }
-
-        PrettyMethod = reinterpret_cast<std::string (*)(void *, bool)>(getSymCompat(art_lib_path,"_ZN3art9ArtMethod12PrettyMethodEPS0_b"));
-        if(!PrettyMethod){
-            PrettyMethod = reinterpret_cast<std::string (*)(void *, bool)>(getSymCompat(art_lib_path,"_ZN3art12PrettyMethodEPNS_9ArtMethodEb"));
-        }
-        if(!PrettyMethod){
-            PrettyMethod = reinterpret_cast<std::string (*)(void *, bool)>(getSymCompat(art_lib_path,"_ZN3art12PrettyMethodEPNS_6mirror9ArtMethodEb"));
-        }
-        LOGD("found libart PrettyMethod symbol:%p",PrettyMethod);
-
-
-        //init compile
-        if (SDK_INT >= ANDROID_N) {
-            if (SDK_INT >= ANDROID_R) {
-                globalJitCompileHandlerAddr = reinterpret_cast<art::jit::JitCompiler **>(getSymCompat(art_lib_path, "_ZN3art3jit3Jit13jit_compiler_E"));
-            } else {
-                globalJitCompileHandlerAddr = reinterpret_cast<art::jit::JitCompiler **>(getSymCompat(art_lib_path, "_ZN3art3jit3Jit20jit_compiler_handle_E"));
-            }
-            if (SDK_INT >= ANDROID_Q) {
-                jitCompileMethodQ = reinterpret_cast<bool (*)(void *, void *, void *, bool,
-                                                         bool)>(getSymCompat(jit_lib_path, "jit_compile_method"));
-            } else {
-                jitCompileMethod = reinterpret_cast<bool (*)(void *, void *, void *,
-                                                             bool)>(getSymCompat(jit_lib_path,
-                                                                                 "jit_compile_method"));
-            }
-            auto jit_load = getSymCompat(jit_lib_path, "jit_load");
-            if (jit_load) {
-                if (SDK_INT >= ANDROID_Q) {
-                    // Android 10：void* jit_load()
-                    // Android 11: JitCompilerInterface* jit_load()
-                    jitCompilerHandle = reinterpret_cast<void*(*)()>(jit_load)();
-                } else {
-                    // void* jit_load(bool* generate_debug_info)
-                    bool generate_debug_info = false;
-                    jitCompilerHandle = reinterpret_cast<void*(*)(void*)>(jit_load)(&generate_debug_info);
-                }
-            } else {
-                jitCompilerHandle = getGlobalJitCompiler();
-            }
-
-            if (jitCompilerHandle != nullptr) {
-                art::CompilerOptions* compilerOptions = getCompilerOptions(
-                        reinterpret_cast<art::jit::JitCompiler *>(jitCompilerHandle));
-                disableJitInline(compilerOptions);
-            }
-
-        }
-
-
-        //init suspend
-        innerSuspendVM = reinterpret_cast<void (*)()>(getSymCompat(art_lib_path,
-                                                                         "_ZN3art3Dbg9SuspendVMEv"));
-        innerResumeVM = reinterpret_cast<void (*)()>(getSymCompat(art_lib_path,
-                                                                        "_ZN3art3Dbg8ResumeVMEv"));
-
-        runtime_instance_ = *reinterpret_cast<void**>(getSymCompat(art_lib_path, "_ZN3art7Runtime9instance_E"));
-
-        //init for getObject & JitCompiler
-        const char* add_weak_ref_sym;
-        if (SDK_INT < ANDROID_M) {
-            add_weak_ref_sym = "_ZN3art9JavaVMExt22AddWeakGlobalReferenceEPNS_6ThreadEPNS_6mirror6ObjectE";
-        } else if (SDK_INT < ANDROID_N) {
-            add_weak_ref_sym = "_ZN3art9JavaVMExt16AddWeakGlobalRefEPNS_6ThreadEPNS_6mirror6ObjectE";
-        } else  {
-            add_weak_ref_sym = SDK_INT <= ANDROID_N2
-                                           ? "_ZN3art9JavaVMExt16AddWeakGlobalRefEPNS_6ThreadEPNS_6mirror6ObjectE"
-                                           : "_ZN3art9JavaVMExt16AddWeakGlobalRefEPNS_6ThreadENS_6ObjPtrINS_6mirror6ObjectEEE";
-        }
-
-        addWeakGlobalRef = reinterpret_cast<jobject (*)(JavaVM *, void *,
-                                                   void *)>(getSymCompat(art_lib_path, add_weak_ref_sym));
-
-        if (SDK_INT >= ANDROID_Q) {
-            origin_jit_update_options = reinterpret_cast<void (**)(void *)>(getSymCompat(art_lib_path, "_ZN3art3jit3Jit19jit_update_options_E"));
-        }
-
-        if (SDK_INT > ANDROID_N) {
-            profileSaver_ForceProcessProfiles = reinterpret_cast<void (*)()>(getSymCompat(art_lib_path, "_ZN3art12ProfileSaver20ForceProcessProfilesEv"));
-        }
-
-        //init native hook lib
-        void* native_hook_handle = dlopen("libsandhook-native.so", RTLD_LAZY | RTLD_GLOBAL);
-        if (native_hook_handle) {
-            hook_native = reinterpret_cast<void *(*)(void *, void *)>(dlsym(native_hook_handle, "SandInlineHook"));
-        } else {
-            hook_native = reinterpret_cast<void *(*)(void *, void *)>(getSymCompat(
-                    "libsandhook-native.so", "SandInlineHook"));
-        }
-
-        if (SDK_INT >= ANDROID_R && hook_native) {
-            const char *symbol_decode_method = sizeof(void*) == 8 ? "_ZN3art3jni12JniIdManager15DecodeGenericIdINS_9ArtMethodEEEPT_m" : "_ZN3art3jni12JniIdManager15DecodeGenericIdINS_9ArtMethodEEEPT_j";
-            void *decodeArtMethod = getSymCompat(art_lib_path, symbol_decode_method);
-            if (art_lib_path != nullptr) {
-                origin_DecodeArtMethodId = reinterpret_cast<ArtMethod *(*)(void *,
-                                                                           jmethodID)>(hook_native(
-                        decodeArtMethod,
-                        reinterpret_cast<void *>(replace_DecodeArtMethodId)));
-                LOGD("libart DecodeGenericId hook:%d",origin_DecodeArtMethodId == nullptr);
-            }
-
-            void *shouldUseInterpreterEntrypoint = getSymCompat(art_lib_path,
-                                                                "_ZN3art11ClassLinker30ShouldUseInterpreterEntrypointEPNS_9ArtMethodEPKv");
-            if (shouldUseInterpreterEntrypoint != nullptr) {
-                origin_ShouldUseInterpreterEntrypoint = reinterpret_cast<bool (*)(ArtMethod *,
-                                                                                  const void *)>(hook_native(
-                        shouldUseInterpreterEntrypoint,
-                        reinterpret_cast<void *>(replace_ShouldUseInterpreterEntrypoint)));
-                LOGD("libart ShouldUseInterpreterEntrypoint hook:%p",origin_ShouldUseInterpreterEntrypoint);
-            }
-
-            // TODO: need to fix isJavaDebuggable
-            // TODO: Lsplant里Instrumentation::Init作用 如果是JavaDebubgable，如果更新ArtMethod入口，那么不修改hook的，而是修改backup的
-            // If ShouldUseInterpreter inlined , setJavaDebuggable to False to avoid use interpreter
-            // 如果javaDebuggable为true，那么一定不会使用aotCode作为方法入口，那么方法就会被解释执行从而入口替换失效 canUseAotCode(https://cs.android.com/android/platform/superproject/+/master:art/runtime/instrumentation.cc;drc=515ab03a9a7777dfd47ce486f50cb8a2a0a8640f;bpv=1;bpt=1;l=294)
-            //if(IsJavaDebuggable(env)){
-                if(!SetJavaDebuggable){
-                    SetJavaDebuggable = reinterpret_cast<void (*)(void *,bool )>(getSymCompat(art_lib_path,"_ZN3art7Runtime17SetJavaDebuggableEb"));
-                    LOGD("libart find Runtime SetJavaDebuggable method!");
-                }
-                if(SetJavaDebuggable){
-                    LOGD("libart set Runtime JavaDebuggable false");
-                    SetJavaDebuggable(runtime_instance_, false);
-                }
-            //}
-        }
-
-        if (SDK_INT >= ANDROID_Q && hook_native) {
-            if (void* hidden_api = getSymCompat(art_lib_path, "_ZN3art9hiddenapi6detail28ShouldDenyAccessToMemberImplINS_9ArtMethodEEEbPT_NS0_7ApiListENS0_12AccessMethodE")) {
-                hook_native(hidden_api, reinterpret_cast<void*>(replace_hidden_api));
-            }
-            if (void* hidden_api = getSymCompat(art_lib_path, "_ZN3art9hiddenapi6detail28ShouldDenyAccessToMemberImplINS_8ArtFieldEEEbPT_NS0_7ApiListENS0_12AccessMethodE")) {
-                hook_native(hidden_api, reinterpret_cast<void*>(replace_hidden_api));
-            }
-        }
-
-        if (SDK_INT == ANDROID_P && hook_native) {
-            if (void* hidden_api = getSymCompat(art_lib_path, "_ZN3art9hiddenapi6detail19GetMemberActionImplINS_9ArtMethodEEENS0_6ActionEPT_NS_20HiddenApiAccessFlags7ApiListES4_NS0_12AccessMethodE")) {
-                hook_native(hidden_api, reinterpret_cast<void*>(replace_hidden_api));
-            }
-            if (void* hidden_api = getSymCompat(art_lib_path, "_ZN3art9hiddenapi6detail19GetMemberActionImplINS_8ArtFieldEEENS0_6ActionEPT_NS_20HiddenApiAccessFlags7ApiListES4_NS0_12AccessMethodE")) {
-                hook_native(hidden_api, reinterpret_cast<void*>(replace_hidden_api));
-            }
-        }
-    }
-
-    bool canCompile() {
-        if (SDK_INT >= ANDROID_R)
-            return false;
-        if (getGlobalJitCompiler() == nullptr) {
-            LOGE("JIT not init!");
+        auto runtime_class = env->FindClass("dalvik/system/VMRuntime");
+        if (!runtime_class) {
+            LOGE("Failed to find VMRuntime");
             return false;
         }
-        JNIEnv *env;
-        jvm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
-        return getBooleanFromJava(env, "com/swift/sandhook/SandHookConfig",
-                                  "compiler");
-    }
-
-    bool compileMethod(void* artMethod, void* thread) {
-        if (jitCompilerHandle == nullptr)
-            return false;
-        if (!canCompile()) return false;
-
-        //backup thread flag and state because of jit compile function will modify thread state
-        uint32_t old_flag_and_state = *((uint32_t *) thread);
-        bool ret;
-        if (SDK_INT >= ANDROID_Q) {
-            if (jitCompileMethodQ == nullptr) {
-                return false;
-            }
-            ret = jitCompileMethodQ(jitCompilerHandle, artMethod, thread, false, false);
-        } else {
-            if (jitCompileMethod == nullptr) {
-                return false;
-            }
-            ret= jitCompileMethod(jitCompilerHandle, artMethod, thread, false);
-        }
-        memcpy(thread, &old_flag_and_state, 4);
-        return ret;
-    }
-
-    void suspendVM() {
-        if (innerSuspendVM == nullptr || innerResumeVM == nullptr)
-            return;
-        innerSuspendVM();
-    }
-
-    void resumeVM() {
-        if (innerSuspendVM == nullptr || innerResumeVM == nullptr)
-            return;
-        innerResumeVM();
-    }
-
-    bool canGetObject() {
-        return addWeakGlobalRef != nullptr;
-    }
-
-    void *getCurrentThread() {
-        return __get_tls()[TLS_SLOT_ART_THREAD];
-    }
-
-    jobject getJavaObject(JNIEnv* env, void* thread, void* address) {
-        if (addWeakGlobalRef == nullptr)
-            return nullptr;
-
-        jobject object = addWeakGlobalRef(jvm, thread, address);
-        if (object == nullptr)
-            return nullptr;
-
-        jobject result = env->NewLocalRef(object);
-        env->DeleteWeakGlobalRef(object);
-
-        return result;
-    }
-
-    art::jit::JitCompiler* getGlobalJitCompiler() {
-        if (SDK_INT < ANDROID_N)
-            return nullptr;
-        if (globalJitCompileHandlerAddr == nullptr)
-            return nullptr;
-        return *globalJitCompileHandlerAddr;
-    }
-
-    art::CompilerOptions* getCompilerOptions(art::jit::JitCompiler* compiler) {
-        if (compiler == nullptr)
-            return nullptr;
-        return compiler->compilerOptions.get();
-    }
-
-    art::CompilerOptions* getGlobalCompilerOptions() {
-        return getCompilerOptions(getGlobalJitCompiler());
-    }
-
-    bool disableJitInline(art::CompilerOptions* compilerOptions) {
-        if (compilerOptions == nullptr)
-            return false;
-        size_t originOptions = compilerOptions->getInlineMaxCodeUnits();
-        //maybe a real inlineMaxCodeUnits
-        if (originOptions > 0 && originOptions <= 1024) {
-            compilerOptions->setInlineMaxCodeUnits(0);
-            return true;
-        } else {
+        auto get_runtime_method = env->GetStaticMethodID(runtime_class, "getRuntime",
+                                                         "()Ldalvik/system/VMRuntime;");
+        if (!get_runtime_method) {
+            LOGE("Failed to find VMRuntime.getRuntime()");
             return false;
         }
-    }
-
-    void* getInterpreterBridge(bool isNative) {
-        SandHook::ElfImg libart(art_lib_path);
-        if (isNative) {
-            return reinterpret_cast<void *>(libart.getSymbAddress("art_quick_generic_jni_trampoline"));
-        } else {
-            return reinterpret_cast<void *>(libart.getSymbAddress("art_quick_to_interpreter_bridge"));
-        }
-    }
-
-    //to replace jit_update_option
-    void fake_jit_update_options(void* handle) {
-        //do nothing
-        LOGW("android q: art request update compiler options");
-        return;
-    }
-
-    bool replaceUpdateCompilerOptionsQ() {
-        if (SDK_INT < ANDROID_Q)
+        auto runtime = env->CallStaticObjectMethod(runtime_class, get_runtime_method);
+        if (!runtime) {
+            LOGE("Failed to get VMRuntime");
             return false;
-        if (origin_jit_update_options == nullptr
-            || *origin_jit_update_options == nullptr)
+        }
+        auto is_debuggable_method =
+                env->GetMethodID(runtime_class, "isJavaDebuggable", "()Z");
+        if (!is_debuggable_method) {
+            LOGE("Failed to find VMRuntime.isJavaDebuggable()");
             return false;
-        *origin_jit_update_options = fake_jit_update_options;
-        return true;
-    }
-
-    bool forceProcessProfiles() {
-        if (profileSaver_ForceProcessProfiles == nullptr)
-            return false;
-        profileSaver_ForceProcessProfiles();
-        return true;
-    }
-
-    void replaceFixupStaticTrampolines(void *thiz, void *clazz_ptr) {
-        backup_fixup_static_trampolines(thiz, clazz_ptr);
-        if (class_init_callback) {
-            class_init_callback(clazz_ptr);
         }
-    }
+        bool is_debuggable = env->CallBooleanMethod(runtime, is_debuggable_method);
+        LOGD("java runtime debuggable %s", is_debuggable ? "true" : "false");
+        return is_debuggable;
+    }();
+    return kDebuggable;
+}
 
-    void replaceFixupStaticTrampolinesWithThread(void *thiz, void* self, void *clazz_ptr) {
-        backup_fixup_static_trampolines_with_thread(thiz, self, clazz_ptr);
-        if (class_init_callback) {
-            class_init_callback(clazz_ptr);
-        }
-    }
+// paths
+const char *art_lib_path;
+const char *jit_lib_path;
 
-    void *replaceMarkClassInitialized(void * thiz, void * self, uint32_t * clazz_ptr) {
-        auto result = backup_mark_class_initialized(thiz, self, clazz_ptr);
-        if (class_init_callback) {
-            class_init_callback(reinterpret_cast<void*>(*clazz_ptr));
-        }
-        return result;
-    }
+JavaVM *jvm;
 
-    void replaceUpdateMethodsCode(void *thiz, ArtMethod * artMethod, const void *quick_code) {
-        if (SandHook::TrampolineManager::get().methodHooked(artMethod)) {
-            return; //skip
-        }
-        backup_update_methods_code(thiz, artMethod, quick_code);
-    }
+void *(*hook_native)(void *origin, void *replace) = nullptr;
 
-    void MakeInitializedClassVisibilyInitialized(void* self){
-        if(make_initialized_classes_visibly_initialized_) {
-#ifdef __LP64__
-            size_t OFFSET_classlinker = 472;
-            if(SDK_INT >= ANDROID_S){
-                OFFSET_classlinker = 496;
-            }
-#else
-            constexpr size_t OFFSET_classlinker = 276;
-            if(SDK_INT >= ANDROID_S){
-                OFFSET_classlinker = 288;
-            }
-#endif
-            void *thiz = *reinterpret_cast<void **>(
-                    reinterpret_cast<size_t>(runtime_instance_) + OFFSET_classlinker);
-            make_initialized_classes_visibly_initialized_(thiz, self, true);
-        }
-    }
+void (*class_init_callback)(void *) = nullptr;
 
-    bool hookClassInit(void(*callback)(void*)) {
+void (*backup_fixup_static_trampolines)(void *, void *) = nullptr;
+
+void (*backup_fixup_static_trampolines_with_thread)(void *, void *, void *) = nullptr;
+
+void *(*backup_mark_class_initialized)(void *, void *, uint32_t *) = nullptr;
+
+void (*backup_update_methods_code)(void *, ArtMethod *, const void *) = nullptr;
+
+void *(*make_initialized_classes_visibly_initialized_)(void *, void *, bool) = nullptr;
+
+void *runtime_instance_ = nullptr;
+
+void *class_linker_;
+
+void initHideApi(JNIEnv *env) {
+
+    env->GetJavaVM(&jvm);
+
+    if (BYTE_POINT == 8) {
         if (SDK_INT >= ANDROID_R) {
-            void *symMarkClassInitialized = getSymCompat(art_lib_path,
-                                                           "_ZN3art11ClassLinker20MarkClassInitializedEPNS_6ThreadENS_6HandleINS_6mirror5ClassEEE");
-            if (symMarkClassInitialized == nullptr || hook_native == nullptr)
-                return false;
+            art_lib_path = "/apex/com.android.art/lib64/libart.so";
+            jit_lib_path = "/apex/com.android.art/lib64/libart-compiler.so";
+        } else if (SDK_INT >= ANDROID_Q) {
+            art_lib_path = "/apex/com.android.runtime/lib64/libart.so";
+            jit_lib_path = "/apex/com.android.runtime/lib64/libart-compiler.so";
+        } else {
+            art_lib_path = "/system/lib64/libart.so";
+            jit_lib_path = "/system/lib64/libart-compiler.so";
+        }
+    } else {
+        if (SDK_INT >= ANDROID_R) {
+            art_lib_path = "/apex/com.android.art/lib/libart.so";
+            jit_lib_path = "/apex/com.android.art/lib/libart-compiler.so";
+        } else if (SDK_INT >= ANDROID_Q) {
+            art_lib_path = "/apex/com.android.runtime/lib/libart.so";
+            jit_lib_path = "/apex/com.android.runtime/lib/libart-compiler.so";
+        } else {
+            art_lib_path = "/system/lib/libart.so";
+            jit_lib_path = "/system/lib/libart-compiler.so";
+        }
+    }
 
-            void *symUpdateMethodsCode = getSymCompat(art_lib_path,
-                                                         "_ZN3art15instrumentation15Instrumentation21UpdateMethodsCodeImplEPNS_9ArtMethodEPKv");
-            if (symUpdateMethodsCode == nullptr || hook_native == nullptr)
-                return false;
+    PrettyMethod = reinterpret_cast<std::string (*)(void *, bool)>(getSymCompat(art_lib_path,
+                                                                                "_ZN3art9ArtMethod12PrettyMethodEPS0_b"));
+    if (!PrettyMethod) {
+        PrettyMethod = reinterpret_cast<std::string (*)(void *, bool)>(getSymCompat(art_lib_path,
+                                                                                    "_ZN3art12PrettyMethodEPNS_9ArtMethodEb"));
+    }
+    if (!PrettyMethod) {
+        PrettyMethod = reinterpret_cast<std::string (*)(void *, bool)>(getSymCompat(art_lib_path,
+                                                                                    "_ZN3art12PrettyMethodEPNS_6mirror9ArtMethodEb"));
+    }
+    LOGD("found libart PrettyMethod symbol:%p", PrettyMethod);
 
-            backup_mark_class_initialized = reinterpret_cast<void *(*)(void *, void *, uint32_t*)>(hook_native(
-                    symMarkClassInitialized, (void *) replaceMarkClassInitialized));
 
-            backup_update_methods_code = reinterpret_cast<void (*)(void *, ArtMethod *, const void*)>(hook_native(
-                    symUpdateMethodsCode, (void *) replaceUpdateMethodsCode));
-
-            make_initialized_classes_visibly_initialized_ = reinterpret_cast<void* (*)(void*, void*, bool)>(
-                    getSymCompat(art_lib_path, "_ZN3art11ClassLinker40MakeInitializedClassesVisiblyInitializedEPNS_6ThreadEb"));
-
-            if (void *symFixupStaticTrampolines = getSymCompat(art_lib_path,
-                                                               "_ZN3art11ClassLinker22FixupStaticTrampolinesENS_6ObjPtrINS_6mirror5ClassEEE"))
-                backup_fixup_static_trampolines = reinterpret_cast<void (*)(void *, void *)>(hook_native(
-                        symFixupStaticTrampolines, (void *) replaceFixupStaticTrampolines));
-
-            if (void *symFixupStaticTrampolinesWithThread = getSymCompat(art_lib_path,
-                                                                         "_ZN3art11ClassLinker22FixupStaticTrampolinesEPNS_6ThreadENS_6ObjPtrINS_6mirror5ClassEEE"))
-                backup_fixup_static_trampolines_with_thread = reinterpret_cast<void (*)(void *,void *, void*)>(hook_native(
-                        symFixupStaticTrampolinesWithThread, (void *) replaceFixupStaticTrampolinesWithThread));
-
-            if (backup_mark_class_initialized && backup_update_methods_code && (backup_fixup_static_trampolines_with_thread || backup_fixup_static_trampolines)) {
-                class_init_callback = callback;
-                return true;
+    //init compile
+    if (SDK_INT >= ANDROID_N) {
+        if (SDK_INT >= ANDROID_R) {
+            globalJitCompileHandlerAddr = reinterpret_cast<art::jit::JitCompiler **>(getSymCompat(
+                    art_lib_path, "_ZN3art3jit3Jit13jit_compiler_E"));
+        } else {
+            globalJitCompileHandlerAddr = reinterpret_cast<art::jit::JitCompiler **>(getSymCompat(
+                    art_lib_path, "_ZN3art3jit3Jit20jit_compiler_handle_E"));
+        }
+        if (SDK_INT >= ANDROID_Q) {
+            jitCompileMethodQ = reinterpret_cast<bool (*)(void *, void *, void *, bool,
+                                                          bool)>(getSymCompat(jit_lib_path,
+                                                                              "jit_compile_method"));
+        } else {
+            jitCompileMethod = reinterpret_cast<bool (*)(void *, void *, void *,
+                                                         bool)>(getSymCompat(jit_lib_path,
+                                                                             "jit_compile_method"));
+        }
+        auto jit_load = getSymCompat(jit_lib_path, "jit_load");
+        if (jit_load) {
+            if (SDK_INT >= ANDROID_Q) {
+                // Android 10：void* jit_load()
+                // Android 11: JitCompilerInterface* jit_load()
+                jitCompilerHandle = reinterpret_cast<void *(*)()>(jit_load)();
             } else {
-                return false;
+                // void* jit_load(bool* generate_debug_info)
+                bool generate_debug_info = false;
+                jitCompilerHandle = reinterpret_cast<void *(*)(void *)>(jit_load)(
+                        &generate_debug_info);
             }
         } else {
-            void *symFixupStaticTrampolines = getSymCompat(art_lib_path,
-                                                           "_ZN3art11ClassLinker22FixupStaticTrampolinesENS_6ObjPtrINS_6mirror5ClassEEE");
+            jitCompilerHandle = getGlobalJitCompiler();
+        }
 
-            if (symFixupStaticTrampolines == nullptr) {
-                //huawei lon-al00 android 7.0 api level 24
-                symFixupStaticTrampolines = getSymCompat(art_lib_path,
-                                                         "_ZN3art11ClassLinker22FixupStaticTrampolinesEPNS_6mirror5ClassE");
-            }
-            if (symFixupStaticTrampolines == nullptr || hook_native == nullptr)
-                return false;
+        if (jitCompilerHandle != nullptr) {
+            art::CompilerOptions *compilerOptions = getCompilerOptions(
+                    reinterpret_cast<art::jit::JitCompiler *>(jitCompilerHandle));
+            disableJitInline(compilerOptions);
+        }
+
+    }
+
+
+    //init suspend
+    innerSuspendVM = reinterpret_cast<void (*)()>(getSymCompat(art_lib_path,
+                                                               "_ZN3art3Dbg9SuspendVMEv"));
+    innerResumeVM = reinterpret_cast<void (*)()>(getSymCompat(art_lib_path,
+                                                              "_ZN3art3Dbg8ResumeVMEv"));
+
+    runtime_instance_ = *reinterpret_cast<void **>(getSymCompat(art_lib_path,
+                                                                "_ZN3art7Runtime9instance_E"));
+
+    //init for getObject & JitCompiler
+    const char *add_weak_ref_sym;
+    if (SDK_INT < ANDROID_M) {
+        add_weak_ref_sym = "_ZN3art9JavaVMExt22AddWeakGlobalReferenceEPNS_6ThreadEPNS_6mirror6ObjectE";
+    } else if (SDK_INT < ANDROID_N) {
+        add_weak_ref_sym = "_ZN3art9JavaVMExt16AddWeakGlobalRefEPNS_6ThreadEPNS_6mirror6ObjectE";
+    } else {
+        add_weak_ref_sym = SDK_INT <= ANDROID_N2
+                           ? "_ZN3art9JavaVMExt16AddWeakGlobalRefEPNS_6ThreadEPNS_6mirror6ObjectE"
+                           : "_ZN3art9JavaVMExt16AddWeakGlobalRefEPNS_6ThreadENS_6ObjPtrINS_6mirror6ObjectEEE";
+    }
+
+    addWeakGlobalRef = reinterpret_cast<jobject (*)(JavaVM *, void *,
+                                                    void *)>(getSymCompat(art_lib_path,
+                                                                          add_weak_ref_sym));
+
+    if (SDK_INT >= ANDROID_Q) {
+        origin_jit_update_options = reinterpret_cast<void (**)(void *)>(getSymCompat(art_lib_path,
+                                                                                     "_ZN3art3jit3Jit19jit_update_options_E"));
+    }
+
+    if (SDK_INT > ANDROID_N) {
+        profileSaver_ForceProcessProfiles = reinterpret_cast<void (*)()>(getSymCompat(art_lib_path,
+                                                                                      "_ZN3art12ProfileSaver20ForceProcessProfilesEv"));
+    }
+
+    //init native hook lib
+    void *native_hook_handle = dlopen("libsandhook-native.so", RTLD_LAZY | RTLD_GLOBAL);
+    if (native_hook_handle) {
+        hook_native = reinterpret_cast<void *(*)(void *, void *)>(dlsym(native_hook_handle,
+                                                                        "SandInlineHook"));
+    } else {
+        hook_native = reinterpret_cast<void *(*)(void *, void *)>(getSymCompat(
+                "libsandhook-native.so", "SandInlineHook"));
+    }
+
+    if (SDK_INT >= ANDROID_R && hook_native) {
+        const char *symbol_decode_method = sizeof(void *) == 8
+                                           ? "_ZN3art3jni12JniIdManager15DecodeGenericIdINS_9ArtMethodEEEPT_m"
+                                           : "_ZN3art3jni12JniIdManager15DecodeGenericIdINS_9ArtMethodEEEPT_j";
+        void *decodeArtMethod = getSymCompat(art_lib_path, symbol_decode_method);
+        if (art_lib_path != nullptr) {
+            origin_DecodeArtMethodId = reinterpret_cast<ArtMethod *(*)(void *,
+                                                                       jmethodID)>(hook_native(
+                    decodeArtMethod,
+                    reinterpret_cast<void *>(replace_DecodeArtMethodId)));
+            LOGD("libart DecodeGenericId hook:%d", origin_DecodeArtMethodId == nullptr);
+        }
+
+        void *shouldUseInterpreterEntrypoint = getSymCompat(art_lib_path,
+                                                            "_ZN3art11ClassLinker30ShouldUseInterpreterEntrypointEPNS_9ArtMethodEPKv");
+        if (shouldUseInterpreterEntrypoint != nullptr) {
+            origin_ShouldUseInterpreterEntrypoint = reinterpret_cast<bool (*)(ArtMethod *,
+                                                                              const void *)>(hook_native(
+                    shouldUseInterpreterEntrypoint,
+                    reinterpret_cast<void *>(replace_ShouldUseInterpreterEntrypoint)));
+            LOGD("libart ShouldUseInterpreterEntrypoint hook:%p",
+                 origin_ShouldUseInterpreterEntrypoint);
+        }
+
+        // TODO: need to fix isJavaDebuggable
+        // TODO: Lsplant里Instrumentation::Init作用 如果是JavaDebubgable，如果更新ArtMethod入口，那么不修改hook的，而是修改backup的
+        // If ShouldUseInterpreter inlined , setJavaDebuggable to False to avoid use interpreter
+        // 如果javaDebuggable为true，那么一定不会使用aotCode作为方法入口，那么方法就会被解释执行从而入口替换失效 canUseAotCode(https://cs.android.com/android/platform/superproject/+/master:art/runtime/instrumentation.cc;drc=515ab03a9a7777dfd47ce486f50cb8a2a0a8640f;bpv=1;bpt=1;l=294)
+        //if(IsJavaDebuggable(env)){
+        if (!SetJavaDebuggable) {
+            SetJavaDebuggable = reinterpret_cast<void (*)(void *, bool)>(getSymCompat(art_lib_path,
+                                                                                      "_ZN3art7Runtime17SetJavaDebuggableEb"));
+            LOGD("libart find Runtime SetJavaDebuggable method!");
+        }
+        if (SetJavaDebuggable) {
+            LOGD("libart set Runtime JavaDebuggable false");
+            SetJavaDebuggable(runtime_instance_, false);
+        }
+        //}
+    }
+
+    if (SDK_INT >= ANDROID_Q && hook_native) {
+        if (void *hidden_api = getSymCompat(art_lib_path,
+                                            "_ZN3art9hiddenapi6detail28ShouldDenyAccessToMemberImplINS_9ArtMethodEEEbPT_NS0_7ApiListENS0_12AccessMethodE")) {
+            hook_native(hidden_api, reinterpret_cast<void *>(replace_hidden_api));
+        }
+        if (void *hidden_api = getSymCompat(art_lib_path,
+                                            "_ZN3art9hiddenapi6detail28ShouldDenyAccessToMemberImplINS_8ArtFieldEEEbPT_NS0_7ApiListENS0_12AccessMethodE")) {
+            hook_native(hidden_api, reinterpret_cast<void *>(replace_hidden_api));
+        }
+    }
+
+    if (SDK_INT == ANDROID_P && hook_native) {
+        if (void *hidden_api = getSymCompat(art_lib_path,
+                                            "_ZN3art9hiddenapi6detail19GetMemberActionImplINS_9ArtMethodEEENS0_6ActionEPT_NS_20HiddenApiAccessFlags7ApiListES4_NS0_12AccessMethodE")) {
+            hook_native(hidden_api, reinterpret_cast<void *>(replace_hidden_api));
+        }
+        if (void *hidden_api = getSymCompat(art_lib_path,
+                                            "_ZN3art9hiddenapi6detail19GetMemberActionImplINS_8ArtFieldEEENS0_6ActionEPT_NS_20HiddenApiAccessFlags7ApiListES4_NS0_12AccessMethodE")) {
+            hook_native(hidden_api, reinterpret_cast<void *>(replace_hidden_api));
+        }
+    }
+}
+
+bool canCompile() {
+    if (SDK_INT >= ANDROID_R)
+        return false;
+    if (getGlobalJitCompiler() == nullptr) {
+        LOGE("JIT not init!");
+        return false;
+    }
+    JNIEnv *env;
+    jvm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
+    return getBooleanFromJava(env, "com/swift/sandhook/SandHookConfig",
+                              "compiler");
+}
+
+bool compileMethod(void *artMethod, void *thread) {
+    if (jitCompilerHandle == nullptr)
+        return false;
+    if (!canCompile()) return false;
+
+    //backup thread flag and state because of jit compile function will modify thread state
+    uint32_t old_flag_and_state = *((uint32_t *) thread);
+    bool ret;
+    if (SDK_INT >= ANDROID_Q) {
+        if (jitCompileMethodQ == nullptr) {
+            return false;
+        }
+        ret = jitCompileMethodQ(jitCompilerHandle, artMethod, thread, false, false);
+    } else {
+        if (jitCompileMethod == nullptr) {
+            return false;
+        }
+        ret = jitCompileMethod(jitCompilerHandle, artMethod, thread, false);
+    }
+    memcpy(thread, &old_flag_and_state, 4);
+    return ret;
+}
+
+void suspendVM() {
+    if (innerSuspendVM == nullptr || innerResumeVM == nullptr)
+        return;
+    innerSuspendVM();
+}
+
+void resumeVM() {
+    if (innerSuspendVM == nullptr || innerResumeVM == nullptr)
+        return;
+    innerResumeVM();
+}
+
+bool canGetObject() {
+    return addWeakGlobalRef != nullptr;
+}
+
+void *getCurrentThread() {
+    return __get_tls()[TLS_SLOT_ART_THREAD];
+}
+
+jobject getJavaObject(JNIEnv *env, void *thread, void *address) {
+    if (addWeakGlobalRef == nullptr)
+        return nullptr;
+
+    jobject object = addWeakGlobalRef(jvm, thread, address);
+    if (object == nullptr)
+        return nullptr;
+
+    jobject result = env->NewLocalRef(object);
+    env->DeleteWeakGlobalRef(object);
+
+    return result;
+}
+
+art::jit::JitCompiler *getGlobalJitCompiler() {
+    if (SDK_INT < ANDROID_N)
+        return nullptr;
+    if (globalJitCompileHandlerAddr == nullptr)
+        return nullptr;
+    return *globalJitCompileHandlerAddr;
+}
+
+art::CompilerOptions *getCompilerOptions(art::jit::JitCompiler *compiler) {
+    if (compiler == nullptr)
+        return nullptr;
+    return compiler->compilerOptions.get();
+}
+
+art::CompilerOptions *getGlobalCompilerOptions() {
+    return getCompilerOptions(getGlobalJitCompiler());
+}
+
+bool disableJitInline(art::CompilerOptions *compilerOptions) {
+    if (compilerOptions == nullptr)
+        return false;
+    size_t originOptions = compilerOptions->getInlineMaxCodeUnits();
+    //maybe a real inlineMaxCodeUnits
+    if (originOptions > 0 && originOptions <= 1024) {
+        compilerOptions->setInlineMaxCodeUnits(0);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void *getInterpreterBridge(bool isNative) {
+    SandHook::ElfImg libart(art_lib_path);
+    if (isNative) {
+        return reinterpret_cast<void *>(libart.getSymbAddress("art_quick_generic_jni_trampoline"));
+    } else {
+        return reinterpret_cast<void *>(libart.getSymbAddress("art_quick_to_interpreter_bridge"));
+    }
+}
+
+//to replace jit_update_option
+void fake_jit_update_options(void *handle) {
+    //do nothing
+    LOGW("android q: art request update compiler options");
+    return;
+}
+
+bool replaceUpdateCompilerOptionsQ() {
+    if (SDK_INT < ANDROID_Q)
+        return false;
+    if (origin_jit_update_options == nullptr
+        || *origin_jit_update_options == nullptr)
+        return false;
+    *origin_jit_update_options = fake_jit_update_options;
+    return true;
+}
+
+bool forceProcessProfiles() {
+    if (profileSaver_ForceProcessProfiles == nullptr)
+        return false;
+    profileSaver_ForceProcessProfiles();
+    return true;
+}
+
+void replaceFixupStaticTrampolines(void *thiz, void *clazz_ptr) {
+    backup_fixup_static_trampolines(thiz, clazz_ptr);
+    if (class_init_callback) {
+        class_init_callback(clazz_ptr);
+    }
+}
+
+void replaceFixupStaticTrampolinesWithThread(void *thiz, void *self, void *clazz_ptr) {
+    backup_fixup_static_trampolines_with_thread(thiz, self, clazz_ptr);
+    if (class_init_callback) {
+        class_init_callback(clazz_ptr);
+    }
+}
+
+void *replaceMarkClassInitialized(void *thiz, void *self, uint32_t *clazz_ptr) {
+    auto result = backup_mark_class_initialized(thiz, self, clazz_ptr);
+    if (class_init_callback) {
+        class_init_callback(reinterpret_cast<void *>(*clazz_ptr));
+    }
+    return result;
+}
+
+void replaceUpdateMethodsCode(void *thiz, ArtMethod *artMethod, const void *quick_code) {
+    if (SandHook::TrampolineManager::get().methodHooked(artMethod)) {
+        return; //skip
+    }
+    backup_update_methods_code(thiz, artMethod, quick_code);
+}
+
+size_t OffsetOfJavaVm(bool has_small_irt) {
+    if (has_small_irt) {
+        switch (SDK_INT) {
+            case ANDROID_T:
+            case ANDROID_SL:
+            case ANDROID_S:
+                // TODO 这个情况有问题，会走memory search
+                return sizeof(void *) == 8 ? 624 : 300;
+            case ANDROID_R:
+            case ANDROID_Q:
+                return sizeof(void *) == 8 ? 528 : 304;
+            default:
+                LOGE("OffsetOfJavaVM Unexpected android version %d", SDK_INT);
+                abort();
+        }
+    }else{
+        switch (SDK_INT) {
+            case ANDROID_T:
+            case ANDROID_SL:
+            case ANDROID_S:
+                return sizeof(void *) == 8 ? 520 : 300;
+            case ANDROID_R:
+            case ANDROID_Q:
+                return sizeof(void *) == 8 ? 496 : 288;
+            default:
+                LOGE("OffsetOfJavaVM Unexpected android version %d", SDK_INT);
+                abort();
+        }
+    }
+}
+
+/**
+ * 根据runtime获取class_linker
+ * https://github.com/magician8520/BlackBox/blob/99f26925aa303fd0a71543e3713ef3fc57a08e81/Bcore/pine-core/src/main/cpp/android.h#L36
+ */
+void *getClassLinker() {
+    if (class_linker_ != nullptr) {
+        return class_linker_;
+    }
+
+    // If SmallIrtAllocator symbols can be found, then the ROM has merged commit "Initially allocate smaller local IRT"
+    // This commit added a pointer member between `class_linker_` and `java_vm_`. Need to calibrate offset here.
+    // https://android.googlesource.com/platform/art/+/4dcac3629ea5925e47b522073f3c49420e998911
+    // https://github.com/crdroidandroid/android_art/commit/aa7999027fa830d0419c9518ab56ceb7fcf6f7f1
+    bool has_smaller_irt = getSymCompat(art_lib_path,
+                                        "_ZN3art17SmallIrtAllocator10DeallocateEPNS_8IrtEntryE") !=
+                           nullptr;
+    size_t jvm_offset = OffsetOfJavaVm(has_smaller_irt);
+    auto val = jvm_offset
+               ? reinterpret_cast<std::unique_ptr<JavaVM> *>(
+                       reinterpret_cast<uintptr_t>(runtime_instance_) + jvm_offset)->get()
+               : nullptr;
+    if (val == jvm) {
+        LOGD("JavaVM offset matches the default offset");
+    } else {
+        LOGW("JavaVM offset mismatches the default offset, try search the memory of Runtime");
+        int offset = SandHook::Offset::findOffset(runtime_instance_, 1024, 4,jvm);
+        if (offset == -1) {
+            LOGE("Failed to find java vm from Runtime");
+            return nullptr;
+        }
+        jvm_offset = offset;
+        LOGW("Found JavaVM in Runtime at %zu", jvm_offset);
+    }
+    const size_t kDifference = has_smaller_irt
+                               ? sizeof(std::unique_ptr<void>) + sizeof(void *) * 3
+                               : SDK_INT == ANDROID_Q
+                                 ? sizeof(void *) * 2
+                                 : sizeof(std::unique_ptr<void>) + sizeof(void *) * 2;
+
+    class_linker_ = *reinterpret_cast<void**>(reinterpret_cast<uintptr_t>(runtime_instance_) + jvm_offset - kDifference);
+    return class_linker_;
+    // 原来是直接通过class_linker的偏移的方式获取，但发现有些ROM并不稳定，因此改成上面通过java_vm相对定位
+    //#ifdef __LP64__
+    //    size_t OFFSET_classlinker = 472;
+    //        if(SDK_INT >= ANDROID_S){
+    //            OFFSET_classlinker = 496;
+    //        }
+    //#else
+    //    size_t OFFSET_classlinker = 276;
+    //    if (SDK_INT >= ANDROID_S) {
+    //        OFFSET_classlinker = 288;
+    //    }
+    //#endif
+    //    return *reinterpret_cast<void **>(
+    //            reinterpret_cast<size_t>(runtime_instance_) + OFFSET_classlinker);
+}
+
+void MakeInitializedClassVisibilyInitialized(void *self) {
+    if (make_initialized_classes_visibly_initialized_) {
+        make_initialized_classes_visibly_initialized_(getClassLinker(), self, true);
+    }
+}
+
+bool hookClassInit(void(*callback)(void *)) {
+    if (SDK_INT >= ANDROID_R) {
+        void *symMarkClassInitialized = getSymCompat(art_lib_path,
+                                                     "_ZN3art11ClassLinker20MarkClassInitializedEPNS_6ThreadENS_6HandleINS_6mirror5ClassEEE");
+        if (symMarkClassInitialized == nullptr || hook_native == nullptr)
+            return false;
+
+        void *symUpdateMethodsCode = getSymCompat(art_lib_path,
+                                                  "_ZN3art15instrumentation15Instrumentation21UpdateMethodsCodeImplEPNS_9ArtMethodEPKv");
+        if (symUpdateMethodsCode == nullptr || hook_native == nullptr)
+            return false;
+
+        backup_mark_class_initialized = reinterpret_cast<void *(*)(void *, void *,
+                                                                   uint32_t *)>(hook_native(
+                symMarkClassInitialized, (void *) replaceMarkClassInitialized));
+
+        backup_update_methods_code = reinterpret_cast<void (*)(void *, ArtMethod *,
+                                                               const void *)>(hook_native(
+                symUpdateMethodsCode, (void *) replaceUpdateMethodsCode));
+
+        make_initialized_classes_visibly_initialized_ = reinterpret_cast<void *(*)(void *, void *,
+                                                                                   bool)>(
+                getSymCompat(art_lib_path,
+                             "_ZN3art11ClassLinker40MakeInitializedClassesVisiblyInitializedEPNS_6ThreadEb"));
+
+        if (void *symFixupStaticTrampolines = getSymCompat(art_lib_path,
+                                                           "_ZN3art11ClassLinker22FixupStaticTrampolinesENS_6ObjPtrINS_6mirror5ClassEEE"))
             backup_fixup_static_trampolines = reinterpret_cast<void (*)(void *,
                                                                         void *)>(hook_native(
                     symFixupStaticTrampolines, (void *) replaceFixupStaticTrampolines));
-            if (backup_fixup_static_trampolines) {
-                class_init_callback = callback;
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
 
-    JNIEnv *getEnv() {
-        JNIEnv *env;
-        jvm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
-        return env;
-    }
+        if (void *symFixupStaticTrampolinesWithThread = getSymCompat(art_lib_path,
+                                                                     "_ZN3art11ClassLinker22FixupStaticTrampolinesEPNS_6ThreadENS_6ObjPtrINS_6mirror5ClassEEE"))
+            backup_fixup_static_trampolines_with_thread = reinterpret_cast<void (*)(void *, void *,
+                                                                                    void *)>(hook_native(
+                    symFixupStaticTrampolinesWithThread,
+                    (void *) replaceFixupStaticTrampolinesWithThread));
 
-    JNIEnv *attachAndGetEvn() {
-        JNIEnv *env = getEnv();
-        if (env == nullptr) {
-            jvm->AttachCurrentThread(&env, nullptr);
-        }
-        return env;
-    }
-
-    static bool isIndexId(jmethodID mid) {
-        return (reinterpret_cast<uintptr_t>(mid) % 2) != 0;
-    }
-
-    ArtMethod* getArtMethod(JNIEnv *env, jobject method) {
-        jmethodID methodId = env->FromReflectedMethod(method);
-        if (SDK_INT >= ANDROID_R && isIndexId(methodId)) {
-            if (origin_DecodeArtMethodId == nullptr || jniIdManager == nullptr) {
-                auto res = callStaticMethodAddr(env, "com/swift/sandhook/SandHook", "getArtMethod",
-                                                "(Ljava/lang/reflect/Member;)J", method);
-                return reinterpret_cast<ArtMethod *>(res);
-            } else {
-                return origin_DecodeArtMethodId(jniIdManager, methodId);
-            }
-        } else {
-            return reinterpret_cast<ArtMethod *>(methodId);
-        }
-    }
-
-
-    bool newSupportNterp() {
-        LOGD("forbid to use nterp");
-        return false;
-    }
-
-    bool forbidUseNterp() {
-        // bool art::interpreter::CanRuntimeUseNterp(art::interpreter *this)
-        void * symbol = getSymCompat(art_lib_path,"_ZN3art11interpreter18CanRuntimeUseNterpEv");
-        if(symbol && hook_native(symbol,reinterpret_cast<void *>(newSupportNterp))){
+        if (backup_mark_class_initialized && backup_update_methods_code &&
+            (backup_fixup_static_trampolines_with_thread || backup_fixup_static_trampolines)) {
+            class_init_callback = callback;
+            LOGD("hook symMarkClassInitialized success");
             return true;
-        }else{
+        } else {
+            LOGD("hook class init failed, backup_mark_class_initialized:%p,backup_update_methods_code:%p,(backup_fixup_static_trampolines_with_thread || backup_fixup_static_trampolines):%p||%p",
+                 backup_mark_class_initialized, backup_update_methods_code,
+                 backup_fixup_static_trampolines_with_thread, backup_fixup_static_trampolines);
+            return false;
+        }
+    } else {
+        void *symFixupStaticTrampolines = getSymCompat(art_lib_path,
+                                                       "_ZN3art11ClassLinker22FixupStaticTrampolinesENS_6ObjPtrINS_6mirror5ClassEEE");
+
+        if (symFixupStaticTrampolines == nullptr) {
+            //huawei lon-al00 android 7.0 api level 24
+            symFixupStaticTrampolines = getSymCompat(art_lib_path,
+                                                     "_ZN3art11ClassLinker22FixupStaticTrampolinesEPNS_6mirror5ClassE");
+        }
+        if (symFixupStaticTrampolines == nullptr || hook_native == nullptr)
+            return false;
+        backup_fixup_static_trampolines = reinterpret_cast<void (*)(void *,
+                                                                    void *)>(hook_native(
+                symFixupStaticTrampolines, (void *) replaceFixupStaticTrampolines));
+        if (backup_fixup_static_trampolines) {
+            class_init_callback = callback;
+            return true;
+        } else {
             return false;
         }
     }
+}
 
-    std::string prettyMethod(void * art_method,bool with_signature){
-        if(PrettyMethod){
-            return PrettyMethod(art_method,with_signature);
-        }
-        return "";
+JNIEnv *getEnv() {
+    JNIEnv *env;
+    jvm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
+    return env;
+}
+
+JNIEnv *attachAndGetEvn() {
+    JNIEnv *env = getEnv();
+    if (env == nullptr) {
+        jvm->AttachCurrentThread(&env, nullptr);
     }
+    return env;
+}
+
+static bool isIndexId(jmethodID mid) {
+    return (reinterpret_cast<uintptr_t>(mid) % 2) != 0;
+}
+
+ArtMethod *getArtMethod(JNIEnv *env, jobject method) {
+    jmethodID methodId = env->FromReflectedMethod(method);
+    if (SDK_INT >= ANDROID_R && isIndexId(methodId)) {
+        if (origin_DecodeArtMethodId == nullptr || jniIdManager == nullptr) {
+            auto res = callStaticMethodAddr(env, "com/swift/sandhook/SandHook", "getArtMethod",
+                                            "(Ljava/lang/reflect/Member;)J", method);
+            return reinterpret_cast<ArtMethod *>(res);
+        } else {
+            return origin_DecodeArtMethodId(jniIdManager, methodId);
+        }
+    } else {
+        return reinterpret_cast<ArtMethod *>(methodId);
+    }
+}
+
+
+bool newSupportNterp() {
+    LOGD("forbid to use nterp");
+    return false;
+}
+
+bool forbidUseNterp() {
+    // bool art::interpreter::CanRuntimeUseNterp(art::interpreter *this)
+    void *symbol = getSymCompat(art_lib_path, "_ZN3art11interpreter18CanRuntimeUseNterpEv");
+    if (symbol && hook_native(symbol, reinterpret_cast<void *>(newSupportNterp))) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+std::string prettyMethod(void *art_method, bool with_signature) {
+    if (PrettyMethod) {
+        return PrettyMethod(art_method, with_signature);
+    }
+    return "";
+}
 }
 

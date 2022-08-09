@@ -27,7 +27,7 @@ public class MyApp extends Application {
             NativeHookTest.hook();
 
             SandHookConfig.DEBUG = true;
-            SandHookConfig.delayHook = false;
+            SandHookConfig.delayHook = true;
 
             Log.i("SandHook", "current sdk int:" + Build.VERSION.SDK_INT + ",preview sdk int:" + getPreviewSDKInt());
             if (Build.VERSION.SDK_INT == 29 && getPreviewSDKInt() > 0) {

@@ -57,6 +57,10 @@ extern "C" {
 
     void MakeInitializedClassVisibilyInitialized(void* self);
 
+    size_t OffsetOfJavaVm(bool has_small_irt);
+
+    void* getClassLinker();
+
     void addPendingHookNative(ArtMethod *method);
 
     bool forbidUseNterp();

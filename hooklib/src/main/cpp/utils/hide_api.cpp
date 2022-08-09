@@ -473,7 +473,7 @@ extern "C" {
                 OFFSET_classlinker = 496;
             }
 #else
-            constexpr size_t OFFSET_classlinker = 276;
+            size_t OFFSET_classlinker = 276;
             if(SDK_INT >= ANDROID_S){
                 OFFSET_classlinker = 288;
             }
