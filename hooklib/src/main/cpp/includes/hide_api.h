@@ -55,6 +55,10 @@ extern "C" {
 
     ArtMethod* getArtMethod(JNIEnv *env, jobject method);
 
+    size_t OffsetOfJavaVm(bool has_small_irt);
+
+    void* getClassLinker();
+
     void MakeInitializedClassVisibilyInitialized(void* self);
 
     void addPendingHookNative(ArtMethod *method);
