@@ -236,6 +236,8 @@ namespace SandHook {
         art::mirror::ArtMethod *neverCall2 = getArtMethod(env, getMethodObject(env,
                                                                                neverCallTestClass,
                                                                                "neverCall2"));
+        void * ptr = getInterpreterBridge(false);
+        LOGD("GET INTERPRETER BRIDGE:%p,%p",ptr,&ptr);
 
         bool beAot = entryPointQuickCompiled->get(neverCall) != entryPointQuickCompiled->get(neverCall2);
         if (beAot) {

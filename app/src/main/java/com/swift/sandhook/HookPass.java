@@ -1,6 +1,8 @@
 package com.swift.sandhook;
 
 import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.swift.sandhook.test.PendingHookTest;
@@ -113,6 +115,17 @@ public class HookPass {
 
     public static boolean getStaticMethodHookResult() {
         try {
+            SandHook.printMethodEntry(PendingHookTest.class.getMethod("test"));
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    try{
+                        SandHook.printMethodEntry(PendingHookTest.class.getMethod("test"));
+                    }catch (Throwable e){
+                        Log.i("test","error:",e);
+                    }
+                }
+            },10 * 1000);
             return PendingHookTest.test();
         } catch (Throwable e) {
             return false;

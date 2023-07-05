@@ -93,10 +93,13 @@ public class SandHook {
             throw new HookErrorException("method <" + entity.target.toString() + "> can not hook, because of in blacklist!");
 
 
+        HookLog.i("Config.delayHook:" + SandHookConfig.delayHook + ",PendingHookHandler.canWork():" + PendingHookHandler.canWork() + ",ClassStatusUtils.isStaticAndNoInited:" + ClassStatusUtils.isStaticAndNoInited(entity.target));
         if (SandHookConfig.delayHook && PendingHookHandler.canWork() && ClassStatusUtils.isStaticAndNoInited(entity.target)) {
+            HookLog.i("do pending hook:" + target);
             PendingHookHandler.addPendingHook(entity);
             return;
         } else if (entity.initClass) {
+            HookLog.i("resolve static method:" + target);
             resolveStaticMethod(target);
             MakeInitializedClassVisibilyInitialized(getThreadId());
         }
@@ -412,6 +415,8 @@ public class SandHook {
     public static native void addPendingHookNative(Member target);
 
     public static native void forbidUseNterp();
+
+    public static native void printMethodEntry(Method method);
 
     @FunctionalInterface
     public interface HookModeCallBack {

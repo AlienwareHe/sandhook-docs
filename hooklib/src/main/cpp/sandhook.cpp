@@ -100,6 +100,7 @@ bool doHookWithReplacement(JNIEnv* env,
 
     SandHook::HookTrampoline* hookTrampoline = trampolineManager.installReplacementTrampoline(originMethod, hookMethod, backupMethod);
     if (hookTrampoline != nullptr) {
+        LOGD("orign method quick code entry:%p,is quick_to_interpreter:%d",originMethod->getQuickCodeEntry(), originMethod->getQuickCodeEntry() == SandHook::CastArtMethod::quickToInterpreterBridge);
         originMethod->setQuickCodeEntry(hookTrampoline->replacement->getCode());
         LOGD("set origin method quick code entry:%p",hookTrampoline->replacement->getCode());
         void* entryPointFormInterpreter = hookMethod->getInterpreterCodeEntry();
@@ -613,4 +614,11 @@ JNIEXPORT void JNICALL
 Java_com_swift_sandhook_SandHook_forbidUseNterp(JNIEnv *env, jclass clazz) {
     bool forbidUseNterpRes = forbidUseNterp();
     LOGD("forbidUseNterp hook result:%s",forbidUseNterpRes ? "true" : "false");
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_swift_sandhook_SandHook_printMethodEntry(JNIEnv *env, jclass clazz, jobject method) {
+    art::mirror::ArtMethod* origin = getArtMethod(env, method);
+    LOGD("Method quick_code_entry:%p",origin->getQuickCodeEntry());
 }

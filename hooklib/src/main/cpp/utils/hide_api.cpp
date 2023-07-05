@@ -486,6 +486,7 @@ extern "C" {
 
     void replaceUpdateMethodsCode(void *thiz, ArtMethod *artMethod, const void *quick_code) {
         if (SandHook::TrampolineManager::get().methodHooked(artMethod)) {
+            LOGD("skip updateMethodsCode:%s",PrettyMethod(artMethod,true).c_str());
             return; //skip
         }
         backup_update_methods_code(thiz, artMethod, quick_code);

@@ -7,11 +7,11 @@
       <module name="sandhook-docs.hooklib" target="1.8" />
       <module name="sandhook-docs.nativehook" target="1.8" />
       <module name="sandhook-docs.xposedcompat" target="1.8" />
-      <module name="SandHook.app" target="11" />
-      <module name="SandHook.hookers" target="11" />
-      <module name="SandHook.hooklib" target="11" />
-      <module name="SandHook.nativehook" target="11" />
-      <module name="SandHook.xposedcompat" target="11" />
+      <module name="SandHook.app" target="17" />
+      <module name="SandHook.hookers" target="17" />
+      <module name="SandHook.hooklib" target="17" />
+      <module name="SandHook.nativehook" target="17" />
+      <module name="SandHook.xposedcompat" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>
